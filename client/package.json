@@ -1,0 +1,14 @@
+{
+  "name": "client",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "clientDev": "astro dev",
+    "clientBuild": "astro check && astro build"
+  },
+  "dependencies": {
+    "@astrojs/vue": "^3.0.4",
+    "astro": "^3.5.7",
+    "vue": "^3.3.8"
+  }
+}
