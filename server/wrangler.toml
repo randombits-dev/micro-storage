@@ -1,8 +1,7 @@
-name = "server"
+name = "micro-storage-api"
 main = "src/index.ts"
 compatibility_date = "2023-10-30"
 
-account_id = "{{ ACCOUNT_ID }}"
 workers_dev = false
 
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)

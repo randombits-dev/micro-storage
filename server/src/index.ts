@@ -1,10 +1,12 @@
+import {hashMessage, verifyMessage} from "viem";
+
 export interface Env {
 	STORAGE_1: R2Bucket;
 	STORAGE_2: R2Bucket;
 }
 
 interface UserObj {
-	files: {id: string, name: string, size: number}[];
+	files: { id: string, name: string, size: number }[];
 }
 
 export default {
@@ -15,6 +17,30 @@ export default {
 		if (request.method === "OPTIONS") {
 			// Handle CORS preflight requests
 			return handleOptions(request);
+		}
+
+		const token = request.headers.get('X-Token-Id');
+		const userId = request.headers.get('X-User-Id') as `0x${string}`;
+		const signature = request.headers.get('X-Signature') as `0x${string}`;
+		const chainlinkSecret = request.headers.get('X-Chainlink-Secret');
+
+		if (!token || !userId) {
+			return new Response('Not authorized', {status: 401});
+		}
+
+		if (chainlinkSecret && request.method === 'DELETE') {
+
+		}
+
+		const hash = hashMessage(String(token));
+		const signatureValid = await verifyMessage({
+			address: userId,
+			message: 'Sign in with ID: ' + hash,
+			signature
+		});
+
+		if (!signatureValid) {
+			return new Response('Not authorized', {status: 401});
 		}
 
 		switch (request.method) {
@@ -44,7 +70,7 @@ async function handleOptions(request: Request) {
 
 		const corsHeaders = {
 			"Access-Control-Allow-Origin": "*",
-			"Access-Control-Allow-Methods": "GET,HEAD,PUT,POST,OPTIONS",
+			"Access-Control-Allow-Methods": "GET,HEAD,PUT,DELETE,POST,OPTIONS",
 			"Access-Control-Max-Age": "86400",
 		};
 
@@ -61,7 +87,7 @@ async function handleOptions(request: Request) {
 		// Handle standard OPTIONS request.
 		return new Response(null, {
 			headers: {
-				Allow: "GET, HEAD, POST, OPTIONS",
+				Allow: "GET, HEAD, POST, PUT, DELETE, OPTIONS",
 			},
 		});
 	}
@@ -72,10 +98,10 @@ async function handlePut(request: Request, env: Env, ctx: ExecutionContext) {
 	const fileName = request.headers.get('X-File-Name');
 
 	if (!userId || !fileName) {
-		return new Response('Missing X-User-Id or X-File-Name', { status: 400 });
+		return new Response('Missing X-User-Id or X-File-Name', {status: 400});
 	}
 
-	let userObj: UserObj | undefined =  await env.STORAGE_1.get(userId).then(r2Obj => r2Obj?.json());
+	let userObj: UserObj | undefined = await env.STORAGE_1.get(userId).then(r2Obj => r2Obj?.json());
 	if (!userObj) {
 		userObj = {files: []};
 	}
@@ -97,14 +123,13 @@ async function handlePut(request: Request, env: Env, ctx: ExecutionContext) {
 }
 
 async function handleGet(request: Request, env: Env, ctx: ExecutionContext) {
-	const url = new URL(request.url);
-	const key = url.pathname.slice(1);
 	const userId = request.headers.get('X-User-Id');
+	const fileId = request.headers.get('X-File-Id');
 
-	if (key) {
-		const object = await env.STORAGE_2.get(key);
+	if (fileId) {
+		const object = await env.STORAGE_2.get(fileId);
 		if (object === null) {
-			return new Response('Object Not Found', { status: 404 });
+			return new Response('Object Not Found', {status: 404});
 		}
 		return new Response(object.body, {
 			headers: {
@@ -116,7 +141,7 @@ async function handleGet(request: Request, env: Env, ctx: ExecutionContext) {
 
 	const userObj = await env.STORAGE_1.get(userId!);
 	if (userObj === null) {
-		return new Response('Object Not Found', { status: 404 });
+		return new Response('Object Not Found', {status: 404});
 	}
 	return new Response(userObj.body, {
 		headers: {
@@ -127,6 +152,34 @@ async function handleGet(request: Request, env: Env, ctx: ExecutionContext) {
 }
 
 async function handleDelete(request: Request, env: Env, ctx: ExecutionContext) {
-	await env.STORAGE_1.delete(key);
-	return new Response('Deleted!');
+	const userId = request.headers.get('X-User-Id');
+	const fileId = request.headers.get('X-File-Id');
+	if (!fileId || !userId) {
+		return new Response('Invalid request', {status: 400});
+	}
+	const userObj: UserObj | undefined = await env.STORAGE_1.get(userId).then(r2Obj => r2Obj?.json());
+	if (!userObj) {
+		return new Response('Object Not Found', {status: 404});
+	}
+
+	if (fileId === '0') {
+		// delete everything
+		const allFileIds = userObj.files.map(file => file.id);
+		await Promise.all([
+			env.STORAGE_1.delete(userId),
+			env.STORAGE_2.delete(allFileIds)
+		]);
+	} else {
+		userObj.files = userObj.files.filter((file) => file.id !== fileId);
+		await env.STORAGE_1.put(userId, JSON.stringify(userObj));
+		await env.STORAGE_2.delete(fileId);
+	}
+
+	return new Response(null, {
+		status: 200,
+		headers: {
+			"Access-Control-Allow-Origin": "*",
+			"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS"
+		}
+	});
 }

@@ -1,0 +1,14 @@
+{
+  "name": "micro-storage-chainlink-api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "serverDeploy": "wrangler deploy",
+    "serverDev": "wrangler dev --remote"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20230419.0",
+    "typescript": "^5.0.4",
+    "wrangler": "^3.17.0"
+  }
+}

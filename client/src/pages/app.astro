@@ -1,0 +1,9 @@
+---
+import App from "../components/App";
+import Layout from "../layouts/Layout.astro";
+---
+<Layout title="Micro Storage App">
+    <main>
+        <App client:only="react"/>
+    </main>
+</Layout>
