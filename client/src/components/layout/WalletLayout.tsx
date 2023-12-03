@@ -30,21 +30,26 @@ const MainContent = ({children}: PropsWithChildren) => {
 export default function WalletLayout({flex, children}: PropsWithChildren<{
   flex?: boolean
 }>) {
-  const extraClasses = flex ? ' flex flex-col' : '';
+  // const extraClasses = flex ? ' flex flex-col' : '';
 
 
   return (
     <WagmiConfig config={config}>
       <RainbowKitProvider chains={chains} modalSize="compact" theme={customRainbowTheme}>
         <AccountProvider>
-          <div className={"min-h-screen bg-neutral-900 main-container text-neutral-300" + extraClasses}>
+          <div className={"min-h-screen bg-neutral-900 main-container text-neutral-300"}>
+            {/*<div*/}
+            {/*    className={"flex flex-col min-h-screen bg-neutral-900 main-container text-neutral-300" + extraClasses}>*/}
             {/*<MainContent>{children}</MainContent>*/}
-            <Navbar/>
-            <div className="bg-neutral-950 shadow-2xl rounded-lg lg:m-10 m-1 px-10 py-5 flex flex-col text-center">
-              Warning: This is an alpha release, and the servers should only be used for non-sensitive data purposes.
-            </div>
+            {/*<Navbar/>*/}
+            {/*<div className="bg-neutral-950 shadow-2xl rounded-lg lg:m-10 m-1 px-10 py-5 flex flex-col text-center">*/}
+            {/*  Warning: This is an alpha release, and the servers should only be used for non-sensitive data purposes.*/}
+            {/*</div>*/}
+            {/*<div className="flex-grow">*/}
             {children}
+
           </div>
+          {/*</div>*/}
         </AccountProvider>
       </RainbowKitProvider>
     </WagmiConfig>

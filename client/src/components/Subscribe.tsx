@@ -3,6 +3,7 @@ import {useEstimatePrice} from "../hooks/useEstimatePrice.ts";
 import {useBalance} from "../hooks/useBalance.ts";
 import ActionButton from "./common/ActionButton.tsx";
 import {useSubscribe} from "../hooks/useSubscribe.ts";
+import TemplateSpec from "./TemplateSpec.tsx";
 
 interface Props {
 }
@@ -38,7 +39,7 @@ const Subscribe = (params: Props) => {
     }
   };
 
-  const updateHours = (e: any) => {
+  const updateDays = (e: any) => {
     const value = e.target.value;
     if (/^[0-9]*$/.test(value)) {
       setDays(value);
@@ -69,30 +70,30 @@ const Subscribe = (params: Props) => {
   };
 
   return (
-    <div>
-      <div>Base Price: 0.01 USDC per day</div>
-      <div>Price per GB: 0.001 USDC per GB per day</div>
-
       <div>
-        <input className="bg-neutral-900 w-20 px-5 py-1 outline-0"
-               onChange={updateSize}
-               type="text"
-               value={size}
-        /> GB
-      </div>
-      <div>{Math.round((0.01 + 0.001 * size) * 1000) / 1000} per day</div>
+        <TemplateSpec name="BASE PRICE">0.01 USDC per day</TemplateSpec>
+        <TemplateSpec name="PRICE PER GB">0.001 USDC per GB per day</TemplateSpec>
 
-      <div><input className="bg-neutral-900 w-20 px-5 py-1 outline-0"
-                  onChange={updateHours}
-                  type="text"
-                  value={days}
-      /> days
+        <TemplateSpec name="LIMIT (GB)">
+          <input className="bg-neutral-900 w-20 px-5 py-1 outline-0"
+                 onChange={updateSize}
+                 type="text"
+                 value={size}
+          />
+        </TemplateSpec>
+        <TemplateSpec name="PRICE PER DAY">{Math.round((0.01 + 0.001 * size) * 1000) / 1000} per day</TemplateSpec>
+
+        <TemplateSpec name="DAYS"><input className="bg-neutral-900 w-20 px-5 py-1 outline-0"
+                                         onChange={updateDays}
+                                         type="text"
+                                         value={days}
+        />
+        </TemplateSpec>
+        <TemplateSpec name="TOTAL">{price} USDC</TemplateSpec>
+        {
+          writeButton()
+        }
       </div>
-      <div>Total: {price} USDC</div>
-      {
-        writeButton()
-      }
-    </div>
   );
 };
 

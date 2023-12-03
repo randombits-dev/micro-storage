@@ -1,17 +1,21 @@
 import React from 'react';
-import {useAccountStatus} from "../hooks/useAccountStatus.ts";
 import Files from "./Files.tsx";
 import Instructions from "./Instructions.tsx";
+import {UserInfo} from "../utils/definitions.ts";
+import {useAccountContext} from "../providers/AccountProvider.tsx";
+import {useAccount} from "wagmi";
 
 interface Props {
+  userInfo: UserInfo;
+  signature: string;
 }
 
 const Main = (params: Props) => {
+  const {address} = useAccount();
+  const {userInfo, hasSigned, signature} = useAccountContext();
 
-  const {status} = useAccountStatus();
-
-  if (status === 4) {
-    return <Files/>;
+  if (address && userInfo?.token && hasSigned) {
+    return <Files userInfo={userInfo!} signature={signature}/>;
   }
   return <Instructions/>;
 };

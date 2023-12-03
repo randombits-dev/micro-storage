@@ -6,17 +6,19 @@ import Extend from "./account/Extend.tsx";
 import Reduce from "./account/Reduce.tsx";
 
 interface Props {
+  back: () => void;
 }
 
-const ManageAccount = (params: Props) => {
+const ManageAccount = ({back}: Props) => {
   const {userInfo} = useMyAccount();
 
 
   return (
-      <div>
+      <div className="mx-auto w-[500px]">
+        <button className="bg-neutral-800 px-10 py-3 mt-5" onClick={back}> &lt; Back</button>
         <h1 className="text-4xl mb-5">Account Management</h1>
         <div>Your subscription ends {formatExpires(new Date(userInfo?.expires))}</div>
-        <div>Using {1} GB of {userInfo?.token} GB</div>
+        <div>Using {1} GB of {userInfo?.size} GB</div>
 
         <Extend userInfo={userInfo}/>
         <Reduce userInfo={userInfo}/>

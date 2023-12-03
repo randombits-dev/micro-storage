@@ -46,3 +46,12 @@ body {
 .draggedOver {
     border: 2px dashed #ccc;
 }
+
+.folder {
+    padding-left: 20px;
+}
+
+.file {
+    padding-left: 20px;
+}
+

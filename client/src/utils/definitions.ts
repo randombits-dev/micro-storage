@@ -9,9 +9,10 @@ export interface UserInfo {
 }
 
 export interface FileEntry {
-  id: string;
+  id?: string;
   name: string;
-  size: number;
+  size?: number;
+  type: string;
 }
 
 export type ContractWriteStatus = undefined | 'loading' | 'pending' | 'success' | 'error';

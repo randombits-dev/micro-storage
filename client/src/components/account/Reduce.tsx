@@ -42,19 +42,21 @@ const Reduce = ({userInfo}: Props) => {
   };
 
   return (
-    <div>
-      <h2 className="text-4xl mt-10 mb-5">Reduce Limit</h2>
-      <div>Reduce your storage limit and get a refund.</div>
-      <div>
-        <input className="bg-neutral-900 w-20 px-5 py-1 outline-0"
-               onChange={updateSize}
-               type="text"
-               value={size}
-        /> GB
+      <div className="border rounded-lg overflow-hidden my-5">
+        <div className="text-3xl font-bold bg-neutral-200 text-neutral-800 p-3">Change Limit</div>
+        <div className="p-5">
+          <div>Reduce your storage limit and get a refund.</div>
+          <TemplateSpec name="NEW LIMIT">
+            <input className="bg-neutral-900 w-20 px-5 py-1 mr-5 outline-0"
+                   onChange={updateSize}
+                   type="text"
+                   value={size}
+            /> GB
+          </TemplateSpec>
+          <TemplateSpec name="ESTIMATED REFUND">{refundPrice}</TemplateSpec>
+          {writeButton()}
+        </div>
       </div>
-      <TemplateSpec name="ESTIMATED REFUND">{refundPrice}</TemplateSpec>
-      {writeButton()}
-    </div>
   );
 };
 

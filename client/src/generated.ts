@@ -6671,33 +6671,11 @@ export const microConsumerABI = [
     outputs: [],
   },
   {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'tokenId', internalType: 'uint256', type: 'uint256' },
-      { name: 'size', internalType: 'uint256', type: 'uint256' },
-      { name: 'source', internalType: 'string', type: 'string' },
-    ],
-    name: 'requestToReduce2',
-    outputs: [],
-  },
-  {
     stateMutability: 'view',
     type: 'function',
     inputs: [],
     name: 'runs',
     outputs: [{ name: '', internalType: 'uint16', type: 'uint16' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'requestId', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'response', internalType: 'bytes', type: 'bytes' },
-      { name: 'err', internalType: 'bytes', type: 'bytes' },
-    ],
-    name: 'testFullFill',
-    outputs: [],
   },
   {
     stateMutability: 'nonpayable',
@@ -6718,9 +6696,12 @@ export const microStorageABI = [
     type: 'constructor',
     inputs: [
       { name: '_paymentCoin', internalType: 'address', type: 'address' },
-      { name: '_consumer', internalType: 'address', type: 'address' },
     ],
   },
+  { type: 'error', inputs: [], name: 'EmptyArgs' },
+  { type: 'error', inputs: [], name: 'EmptySource' },
+  { type: 'error', inputs: [], name: 'NoInlineSecrets' },
+  { type: 'error', inputs: [], name: 'OnlyRouterCanFulfill' },
   {
     type: 'event',
     anonymous: false,
@@ -6834,6 +6815,22 @@ export const microStorageABI = [
     type: 'event',
     anonymous: false,
     inputs: [
+      { name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true },
+    ],
+    name: 'RequestFulfilled',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true },
+    ],
+    name: 'RequestSent',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
       {
         name: 'tokenId',
         internalType: 'uint256',
@@ -6942,6 +6939,17 @@ export const microStorageABI = [
     outputs: [{ name: '', internalType: 'address', type: 'address' }],
   },
   {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    inputs: [
+      { name: 'requestId', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'response', internalType: 'bytes', type: 'bytes' },
+      { name: 'err', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'handleOracleFulfillment',
+    outputs: [],
+  },
+  {
     stateMutability: 'view',
     type: 'function',
     inputs: [
@@ -6949,6 +6957,13 @@ export const microStorageABI = [
       { name: 'operator', internalType: 'address', type: 'address' },
     ],
     name: 'isApprovedForAll',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [],
+    name: 'lastSuccess',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
   },
   {
@@ -7026,6 +7041,13 @@ export const microStorageABI = [
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [],
+    name: 'runs',
+    outputs: [{ name: '', internalType: 'uint16', type: 'uint16' }],
   },
   {
     stateMutability: 'nonpayable',

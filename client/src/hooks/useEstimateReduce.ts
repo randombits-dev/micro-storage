@@ -5,7 +5,7 @@ export const useEstimateReduce = (userInfo: UserInfo, size: number) => {
   if (userInfo) {
     const timeLeft = userInfo.expires - new Date().getTime();
     const daysLeft = Math.floor(timeLeft / 1000 / 3600 / 24);
-    const price = (Number(formatUSDC(BigInt(1000))) * daysLeft * size).toFixed(2) + ' USDC';
+    const price = (Number(formatUSDC(BigInt(1000))) * daysLeft * (userInfo.size - size)).toFixed(3) + ' USDC';
     return {price};
   }
   return {};

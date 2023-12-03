@@ -11,14 +11,19 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/vendor/openzeppelin-solidity/v4.8.0/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "./MicroConsumer.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/FunctionsClient.sol";
+import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol";
+
+//import "./MicroConsumer.sol";
 //import "@openzeppelin/contracts/utils/Strings.sol";
 //import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/FunctionsClient.sol";
 //import {ConfirmedOwner} from "@chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol";
 //import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol";
 
-contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable {
-//  using FunctionsRequest for FunctionsRequest.Request;
+contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, FunctionsClient {
+  using FunctionsRequest for FunctionsRequest.Request;
   using SafeMath for uint256;
 
   uint256 public basePrice = 1e4;
@@ -27,6 +32,10 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable {
   uint256 public currentUsers = 0;
   uint256 public minRentalTime = 86400; // 1 day
   uint256 public maxRentalTime = 2592000; // 30 days
+  uint256 public maxRentalSize = 5;
+
+  uint16 public runs = 0;
+  bool public lastSuccess = false;
 
   struct UserInfo {
     address user;
@@ -38,17 +47,17 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable {
   uint256 private nftId = 1;
   address private paymentCoin;
   address private devAddress;
-  MicroConsumer consumer;
+//  MicroConsumer consumer;
 
   mapping(uint256 => UserInfo) private _userInfo;
 
   event Subscribe(uint256 tokenId);
   event Reduce(uint256 value);
 
-  constructor(address _paymentCoin, address _consumer) ERC721("MicroStorage", "MicroStorage") {
+  constructor(address _paymentCoin) ERC721("MicroStorage", "MicroStorage") FunctionsClient(0x5FC8d32690cc91D4c39d9d3abcBD16989F875707) {
     paymentCoin = _paymentCoin;
     devAddress = msg.sender;
-    consumer = MicroConsumer(_consumer);
+//    consumer = MicroConsumer(_consumer);
   }
 
   function userInfo(uint256 tokenId) external view returns (UserInfo memory, bool) {
@@ -65,8 +74,9 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable {
   }
 
   function subscribe(string memory metadata, uint256 amount, uint256 size) external {
-    cleanUpOldRentals();
-    uint256 timeRequested = amount.mul(86400).div(pricePerDay.add(basePrice));
+//    cleanUpOldRentals();
+    require(size <= maxRentalSize, "size too large");
+    uint256 timeRequested = amount.mul(86400).div(pricePerDay.mul(size).add(basePrice));
     require(timeRequested >= minRentalTime, "minimum rental time not met");
     require(timeRequested <= maxRentalTime, "max rental time");
     IERC20 tk = IERC20(paymentCoin);
@@ -84,8 +94,9 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable {
 
   function extend(uint256 tokenId, uint256 amount, uint256 size) external {
     require(userOf(tokenId) == msg.sender, "caller is not owner");
+    require(size <= maxRentalSize, "size too large");
     UserInfo storage user = _userInfo[tokenId];
-    uint256 timeRequested = amount.mul(86400).div(pricePerDay.add(basePrice));
+    uint256 timeRequested = amount.mul(86400).div(pricePerDay.mul(size).add(basePrice));
     require(user.expires + timeRequested < block.timestamp + maxRentalTime, "max rental time");
 
     IERC20 tk = IERC20(paymentCoin);
@@ -96,39 +107,52 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable {
   }
 
   function reduce(uint256 tokenId, uint256 size, string memory source, bytes32 donId, uint64 subId) external {
-//    FunctionsRequest.Request memory req;
-//    req.initializeRequestForInlineJavaScript(source);
-//    string[] memory args = new string[](2);
-//    args[0] = Strings.toString(tokenId);
-//    args[1] = Strings.toString(size);
-//    req.setArgs(args);
-//    _sendRequest(req.encodeCBOR(), uint64(0), uint32(9999999), "");
-    consumer.requestToReduce(tokenId, size, source, donId, subId);
+    FunctionsRequest.Request memory req;
+    req.initializeRequestForInlineJavaScript(source);
+    string[] memory args = new string[](2);
+    args[0] = Strings.toString(tokenId);
+    args[1] = Strings.toString(size);
+    req.setArgs(args);
+    _sendRequest(req.encodeCBOR(), subId, uint32(300000), donId);
   }
 
-//  // TODO: Remove
-//  function testFullFill(bytes32 requestId, bytes memory response, bytes memory err) public {
-//    fulfillRequest(requestId, response, err);
-//  }
-//
-//  // TODO: Change to internal
-//  function fulfillRequest(
-//    bytes32 requestId,
-//    bytes memory response,
-//    bytes memory err
-//  ) internal override {
-//    console.log("fulfillRequest");
-////    console.log(response);
-////    console.log(err);
-////    emit Response(requestId, s_lastResponse, s_lastError);
-//  }
+  function fulfillRequest(
+    bytes32 requestId,
+    bytes memory response,
+    bytes memory err
+  ) internal override {
+    console.log("fulfillRequest");
+    bool success;
+    bytes32 func;
+    bytes memory params;
+    (success, func, params) = abi.decode(response, (bool, bytes32, bytes));
+    runs++;
+    console.logBytes32(func);
+    if (func == "reduce") {
+      if (success) {
+        uint256 tokenId;
+        uint16 size;
+        (tokenId, size) = abi.decode(params, (uint256, uint16));
+
+        lastSuccess = true;
+        console.log("success");
+        UserInfo storage user = _userInfo[tokenId];
+        uint256 secondsLeft = uint256(user.expires - block.timestamp);
+        uint256 creditsToGive = secondsLeft.mul(pricePerDay.mul(user.size - size)).div(86400);
+        IERC20 tk = IERC20(paymentCoin);
+        tk.transfer(user.user, creditsToGive);
+        user.size = size;
+        user.payment -= creditsToGive;
+      }
+    }
+  }
 
   function unsubscribe(uint256 tokenId) external {
     require(userOf(tokenId) == msg.sender, "caller is not owner");
     UserInfo storage user = _userInfo[tokenId];
-    uint256 secondsLeft = uint256(user.expires - block.timestamp).sub(60);
+    uint256 secondsLeft = uint256(user.expires - block.timestamp);
     if (secondsLeft > 0) {
-      uint256 creditsToGive = secondsLeft.mul(pricePerDay).div(86400);
+      uint256 creditsToGive = secondsLeft.mul(pricePerDay.mul(user.size).add(basePrice)).div(86400);
       IERC20 tk = IERC20(paymentCoin);
       tk.transfer(msg.sender, creditsToGive);
       user.payment -= creditsToGive;

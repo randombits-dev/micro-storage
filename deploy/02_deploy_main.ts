@@ -2,7 +2,6 @@ import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {encodeBytes32String} from 'ethers';
 import {defaultAbiCoder} from '@ethersproject/abi';
-import {decodeEventLog} from 'viem';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments, getNamedAccounts, ethers} = hre;
@@ -11,7 +10,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployer, dev} = await getNamedAccounts();
   const usdc = await get('USDC');
 
-  const consumerResult = await deploy('MicroConsumer', {
+  await deploy('MicroConsumer', {
     contract: 'MicroConsumer',
     from: deployer,
     args: [],
@@ -21,7 +20,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const storageResult = await deploy('MicroStorage', {
     contract: 'MicroStorage',
     from: deployer,
-    args: [usdc.address, consumerResult.address],
+    args: [usdc.address],
     log: true,
   });
 
@@ -81,7 +80,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true,
   });
 
-  await execute('FunctionsRouter', {from: deployer}, 'createSubscriptionWithConsumer', consumerResult.address);
+  await execute('FunctionsRouter', {from: deployer}, 'createSubscriptionWithConsumer', storageResult.address);
   await execute('FunctionsRouter', {from: deployer}, 'setAllowListId', encodeBytes32String('allowlist'));
   await execute('FunctionsRouter', {from: deployer}, 'proposeContractsUpdate', [encodeBytes32String('allowlist'),
     encodeBytes32String('local-functions-testnet')], [tosResult.address, coordinatorResult.address]);
@@ -99,7 +98,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     .toString('hex');
   await execute('FunctionsCoordinatorTestHelper', {from: deployer}, 'setThresholdPublicKey', thresholdKey);
 
-  await execute('MicroConsumer', {from: deployer}, 'transferOwnership', storageResult.address);
+  // await execute('MicroConsumer', {from: deployer}, 'transferOwnership', storageResult.address);
   await execute('MicroStorage', {from: deployer}, 'changeDevAddress', dev);
 
   hre.ethers.getContract('FunctionsCoordinatorTestHelper').then((coordinator) => {
@@ -144,21 +143,30 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
             commitment.timeoutTimestamp,
           ],
         );
+
+        const resParams = defaultAbiCoder.encode(
+          ['uint256', 'uint16'],
+          [1, 2]
+        );
+
+        const res = defaultAbiCoder.encode(['bool', 'bytes32', 'bytes'],
+          [1, encodeBytes32String('reduce'), resParams]);
+
         const encodedReport = defaultAbiCoder.encode(
           ['bytes32[]', 'bytes[]', 'bytes[]', 'bytes[]', 'bytes[]'],
-          [[requestId], [encodeBytes32String('true')], [[]], [encodedCommitment], [[]]],
+          [[requestId], [res], [[]], [encodedCommitment], [[]]],
         );
         const result = await execute('FunctionsCoordinatorTestHelper', {from: deployer, gasLimit: 1_000_000}, 'callReport', encodedReport);
         // console.log(result.status);
         // console.log(result.events);
-        for (const log of result.events!) {
-          const e = decodeEventLog({
-            abi: routerResult.abi,
-            data: log.data,
-            topics: log.topics,
-          });
-          console.log(e);
-        }
+        // for (const log of result.events!) {
+        //   const e = decodeEventLog({
+        //     abi: routerResult.abi,
+        //     data: log.data,
+        //     topics: log.topics,
+        //   });
+        //   console.log(e);
+        // }
 
       } catch (e) {
         console.log(e);

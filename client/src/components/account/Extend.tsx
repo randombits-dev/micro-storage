@@ -4,6 +4,7 @@ import ActionButton from "../common/ActionButton.tsx";
 import {UserInfo} from "../../utils/definitions.ts";
 import {useEstimatePrice} from "../../hooks/useEstimatePrice.ts";
 import {useBalance} from "../../hooks/useBalance.ts";
+import TemplateSpec from "../TemplateSpec.tsx";
 
 interface Props {
   userInfo: UserInfo;
@@ -14,7 +15,7 @@ const Extend = ({userInfo}: Props) => {
   const [days, setDays] = useState(initialDays);
   const [size, setSize] = useState(1);
   const [error, setError] = useState('');
-  const {price, amount} = useEstimatePrice(days, size);
+  const {price, amount} = useEstimatePrice(days, size - userInfo.size);
   const {balance} = useBalance();
   const {execute, enough, status, executeAllowance} = useExtendSubscription(userInfo?.token, amount, size);
   const writeButton = () => {
@@ -32,7 +33,7 @@ const Extend = ({userInfo}: Props) => {
     }
   };
 
-  const updateHours = (e: any) => {
+  const updateDays = (e: any) => {
     const value = e.target.value;
     if (/^[0-9]*$/.test(value)) {
       setDays(value);
@@ -63,33 +64,33 @@ const Extend = ({userInfo}: Props) => {
   };
 
   return (
-    <div>
-      <h2 className="text-4xl mt-10 mb-5">Extend Subscription</h2>
-      <div>
-        <div>Base Price: 0.01 USDC per day</div>
-        <div>Price per GB: 0.001 USDC per GB per day</div>
+      <div className="border rounded-lg overflow-hidden my-5">
+        <div className="text-3xl font-bold bg-neutral-200 text-neutral-800 p-3">Extend Subscription</div>
+        <div className="p-5">
+          <TemplateSpec name="BASE PRICE">0.01 USDC per day</TemplateSpec>
+          <TemplateSpec name="PRICE PER GB">0.001 USDC per GB per day</TemplateSpec>
 
-        <div>
-          <input className="bg-neutral-900 w-20 px-5 py-1 outline-0"
-                 onChange={updateSize}
-                 type="text"
-                 value={size}
-          /> GB
-        </div>
-        <div>{Math.round((0.01 + 0.001 * size) * 1000) / 1000} per day</div>
+          <TemplateSpec name="LIMIT (GB)">
+            <input className="bg-neutral-900 w-20 px-5 py-1 outline-0"
+                   onChange={updateSize}
+                   type="text"
+                   value={size}
+            />
+          </TemplateSpec>
+          <TemplateSpec name="PRICE PER DAY">{Math.round((0.01 + 0.001 * size) * 1000) / 1000} per day</TemplateSpec>
 
-        <div><input className="bg-neutral-900 w-20 px-5 py-1 outline-0"
-                    onChange={updateHours}
-                    type="text"
-                    value={days}
-        /> days
+          <TemplateSpec name="DAYS"><input className="bg-neutral-900 w-20 px-5 py-1 outline-0"
+                                           onChange={updateDays}
+                                           type="text"
+                                           value={days}
+          />
+          </TemplateSpec>
+          <TemplateSpec name="TOTAL">{price} USDC</TemplateSpec>
+          {
+            writeButton()
+          }
         </div>
-        <div>Total: {price} USDC</div>
-        {
-          writeButton()
-        }
       </div>
-    </div>
   );
 };
 
