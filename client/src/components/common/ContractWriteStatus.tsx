@@ -1,8 +1,7 @@
 import React from 'react';
-import {ContractWriteStatus} from "../../utils/definitions";
 
 interface Props {
-  status: ContractWriteStatus;
+  status: string;
   statusMsg: string;
 }
 
@@ -14,6 +13,6 @@ const ContractWriteStatus = ({status, statusMsg}: Props) => {
     </div>;
   }
   return <div></div>;
-}
+};
 
-export default ContractWriteStatus
+export default ContractWriteStatus;

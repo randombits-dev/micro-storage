@@ -17,13 +17,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true,
   });
 
-  const storageResult = await deploy('MicroStorage', {
-    contract: 'MicroStorage',
-    from: deployer,
-    args: [usdc.address, BigInt(1), encodeBytes32String('local-functions-testnet')],
-    log: true,
-  });
-
   const linkResult = await deploy('MockLinkToken', {
     contract: 'MockLinkToken',
     from: deployer,
@@ -50,6 +43,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       subscriptionDepositMinimumRequests: 0,
       subscriptionDepositJuels: 0,
     }],
+    log: true,
+  });
+
+  const storageResult = await deploy('MicroStorage', {
+    contract: 'MicroStorage',
+    from: deployer,
+    args: [usdc.address, routerResult.address, BigInt(1), encodeBytes32String('local-functions-testnet')],
     log: true,
   });
 

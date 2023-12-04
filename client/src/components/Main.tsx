@@ -12,9 +12,9 @@ interface Props {
 
 const Main = (params: Props) => {
   const {address} = useAccount();
-  const {userInfo, hasSigned, signature} = useAccountContext();
+  const {hasToken, userInfo, hasSigned, signature} = useAccountContext();
 
-  if (address && userInfo?.token && hasSigned) {
+  if (hasToken && address && userInfo?.token && hasSigned) {
     return <Files userInfo={userInfo!} signature={signature}/>;
   }
   return <Instructions/>;

@@ -1,15 +1,13 @@
 import React from 'react';
-import {useMyAccount} from "../hooks/useMyAccount.ts";
 import Unsubscribe from "./account/Unsubscribe.tsx";
 import Extend from "./account/Extend.tsx";
-import Reduce from "./account/Reduce.tsx";
+import ChangeLimit from "./account/ChangeLimit.tsx";
 
 interface Props {
   back: () => void;
 }
 
 const ManageAccount = ({back}: Props) => {
-  const {userInfo} = useMyAccount();
 
 
   return (
@@ -19,9 +17,9 @@ const ManageAccount = ({back}: Props) => {
       {/*<div>Your subscription ends {formatExpires(new Date(userInfo?.expires))}</div>*/}
       {/*<div>Using {1} GB of {userInfo?.size} GB</div>*/}
 
-      <Extend userInfo={userInfo}/>
-      <Reduce userInfo={userInfo}/>
-      <Unsubscribe userInfo={userInfo}/>
+      <Extend/>
+      <ChangeLimit/>
+      <Unsubscribe/>
     </div>
   );
 };

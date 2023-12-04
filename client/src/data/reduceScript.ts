@@ -10,3 +10,7 @@ export const ReduceScript = `
   return Buffer.concat([ Functions.encodeUint256(item1Votes), Functions.encodeUint256(item2Votes) ])
 
 `;
+
+export const ReduceTestScript = `
+  return Functions.encodeUint256(1);
+`;

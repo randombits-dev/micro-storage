@@ -5,17 +5,20 @@ import {formatSize} from "../utils/fileUtils.ts";
 
 
 export type AccountContextType = {
+  hasToken: boolean,
   userInfo: any,
   hasSigned: boolean,
-  subscribed: (token: number) => void;
+  refetchUserInfo: () => void;
   signature: string;
   signMessage: () => void;
   calcUsage: (usage: number) => void;
   usage: string;
+  refetchToken: () => void;
 }
 // Create the context
 const AccountContext = createContext<AccountContextType>({
-  userInfo: null, subscribed: () => {
+  hasToken: false,
+  userInfo: null, refetchUserInfo: () => {
   },
   hasSigned: false,
   signature: '',
@@ -24,24 +27,23 @@ const AccountContext = createContext<AccountContextType>({
   calcUsage: () => {
   },
   usage: '',
+  refetchToken: () => {
+  }
 });
 
 // Create the provider component
 export const AccountProvider = ({children}) => {
-  const {userInfo, refetch} = useMyAccount();
+  const {userInfo, hasToken, refetchUserInfo, refetchToken} = useMyAccount();
   const {hasSigned, signature, signMessage} = useServerSignature({token: userInfo?.token});
   const [usage, setUsage] = useState('');
-
-  const subscribed = (token: number) => {
-    void refetch();
-  };
 
   const calcUsage = (usage: number) => {
     setUsage(formatSize(usage));
   };
 
   return (
-    <AccountContext.Provider value={{userInfo, subscribed, hasSigned, signature, signMessage, calcUsage, usage}}>
+    <AccountContext.Provider
+      value={{hasToken, userInfo, refetchUserInfo, hasSigned, signature, signMessage, calcUsage, usage, refetchToken}}>
       {children}
     </AccountContext.Provider>
   );

@@ -6696,6 +6696,8 @@ export const microStorageABI = [
     type: 'constructor',
     inputs: [
       { name: '_paymentCoin', internalType: 'address', type: 'address' },
+      { name: '_subId', internalType: 'uint64', type: 'uint64' },
+      { name: '_donId', internalType: 'bytes32', type: 'bytes32' },
     ],
   },
   { type: 'error', inputs: [], name: 'EmptyArgs' },
@@ -6926,7 +6928,6 @@ export const microStorageABI = [
     inputs: [
       { name: 'tokenId', internalType: 'uint256', type: 'uint256' },
       { name: 'amount', internalType: 'uint256', type: 'uint256' },
-      { name: 'size', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'extend',
     outputs: [],
@@ -6950,6 +6951,16 @@ export const microStorageABI = [
     outputs: [],
   },
   {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    inputs: [
+      { name: 'tokenId', internalType: 'uint256', type: 'uint256' },
+      { name: 'size', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'increaseLimit',
+    outputs: [],
+  },
+  {
     stateMutability: 'view',
     type: 'function',
     inputs: [
@@ -6963,21 +6974,14 @@ export const microStorageABI = [
     stateMutability: 'view',
     type: 'function',
     inputs: [],
-    name: 'lastSuccess',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'maxRentalTime',
+    name: 'maxRentalSize',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
   },
   {
     stateMutability: 'view',
     type: 'function',
     inputs: [],
-    name: 'maxUsers',
+    name: 'maxRentalTime',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
   },
   {
@@ -7029,8 +7033,6 @@ export const microStorageABI = [
       { name: 'tokenId', internalType: 'uint256', type: 'uint256' },
       { name: 'size', internalType: 'uint256', type: 'uint256' },
       { name: 'source', internalType: 'string', type: 'string' },
-      { name: 'donId', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'subId', internalType: 'uint64', type: 'uint64' },
     ],
     name: 'reduce',
     outputs: [],
@@ -7041,13 +7043,6 @@ export const microStorageABI = [
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'runs',
-    outputs: [{ name: '', internalType: 'uint16', type: 'uint16' }],
   },
   {
     stateMutability: 'nonpayable',
@@ -7080,13 +7075,6 @@ export const microStorageABI = [
       { name: 'approved', internalType: 'bool', type: 'bool' },
     ],
     name: 'setApprovalForAll',
-    outputs: [],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [{ name: '_maxUsers', internalType: 'uint256', type: 'uint256' }],
-    name: 'setMaxUsers',
     outputs: [],
   },
   {

@@ -5,7 +5,7 @@ import {MicroStorageAddress} from '../utils/network';
 export const useMyAccount = () => {
   const {address} = useAccount();
 
-  const {data: balance, refetch} = useContractRead({
+  const {data: balance, refetch: refetchToken} = useContractRead({
     address: MicroStorageAddress,
     abi: microStorageABI,
     functionName: 'balanceOf',
@@ -21,7 +21,7 @@ export const useMyAccount = () => {
     args: [address!, BigInt(0)]
   });
 
-  const {data: userInfo, isSuccess} = useContractRead({
+  const {data: userInfo, isSuccess, refetch: refetchUserInfo} = useContractRead({
     address: MicroStorageAddress,
     abi: microStorageABI,
     functionName: 'userInfo',
@@ -29,8 +29,10 @@ export const useMyAccount = () => {
     enabled: !!result
   });
 
-  if (isSuccess) {
+  console.log(userInfo);
+  if (userInfo && Number(userInfo![0].size) > 0) {
     return {
+      hasToken: true,
       userInfo: {
         token: Number(result),
         user: userInfo![0].user,
@@ -38,11 +40,13 @@ export const useMyAccount = () => {
         size: Number(userInfo![0].size),
         expired: userInfo![1]
       },
-      refetch
+      refetchUserInfo,
+      refetchToken
     };
   } else {
     return {
-      refetch
+      hasToken: false,
+      refetchToken
     };
   }
 };

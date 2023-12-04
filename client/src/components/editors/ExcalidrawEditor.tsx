@@ -47,7 +47,7 @@ const ExcalidrawEditor = ({data, saveFile}) => {
   };
 
   return (
-    <div className="h-[500px]">
+    <div className="h-full">
       <Excalidraw key={Math.random()} initialData={parsedData} theme={'dark'} onChange={onChange}
                   onLibraryChange={onLibraryChange}
                   UIOptions={UIOptions}/>

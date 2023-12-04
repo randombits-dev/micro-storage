@@ -53,9 +53,9 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
   mapping(uint256 => UserInfo) private _userInfo;
 
   event Subscribe(uint256 tokenId);
-  event Reduce(uint256 value);
+  event LimitChanged(uint256 tokenId);
 
-  constructor(address _paymentCoin, uint64 _subId, bytes32 _donId) ERC721("MicroStorage", "MicroStorage") FunctionsClient(0x5FC8d32690cc91D4c39d9d3abcBD16989F875707) {
+  constructor(address _paymentCoin, address _router, uint64 _subId, bytes32 _donId) ERC721("MicroStorage", "MicroStorage") FunctionsClient(_router) {
     paymentCoin = _paymentCoin;
     devAddress = msg.sender;
     subId = _subId;
@@ -154,6 +154,7 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
         tk.transfer(user.user, creditsToGive);
         user.size = info.size;
         user.payment -= creditsToGive;
+
       }
     }
   }

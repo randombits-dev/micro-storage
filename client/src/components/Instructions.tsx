@@ -1,5 +1,5 @@
 import React from 'react';
-import Subscribe from "./Subscribe.tsx";
+import Subscribe from "./account/Subscribe.tsx";
 import {useAccountContext} from "../providers/AccountProvider.tsx";
 import {useAccount} from "wagmi";
 import {CustomWalletButton} from "./CustomWalletButton.tsx";
@@ -11,7 +11,7 @@ interface Props {
 
 const Instructions = ({}: Props) => {
 
-  const {userInfo, signMessage, hasSigned} = useAccountContext();
+  const {hasToken, userInfo, signMessage, hasSigned} = useAccountContext();
   const {address} = useAccount();
 
   const renderSub = () => {
@@ -21,7 +21,7 @@ const Instructions = ({}: Props) => {
         {userInfo?.token && <div className="fas fa-check-circle text-green-800"></div>}
       </div>
       {
-        userInfo?.token ? <div className="p-5">
+        hasToken ? <div className="p-5">
           <div>Your subscription ends {formatExpires(new Date(userInfo?.expires))}</div>
           <div>Limit of {userInfo?.size} GB</div>
         </div> : <div className="p-5">
