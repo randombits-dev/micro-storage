@@ -1,23 +1,91 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import SideList from "./SideList.tsx";
+import FileDrop from "./FileDrop.tsx";
 import FileEditor from "./editors/FileEditor.tsx";
-import {FileEntry} from "../utils/definitions.ts";
-import {base64UrlToString, stringToBase64Url} from "../utils/fileUtils.ts";
-import {useFileList} from "../hooks/useFileList.ts";
+import {FileEntry, UserData} from "../utils/definitions.ts";
+import {base64UrlToString, blobToBase64, generateFileId, stringToBase64Url, triggerFileUpload} from "../utils/fileUtils.ts";
+import {useAccountContext} from "../providers/AccountProvider.tsx";
+import DeleteMenu from "./common/DeleteMenu.tsx";
 
 let timeout;
+let newestData;
+let newestTitle;
 const FileContainer = ({userInfo, signature, manageAccount}) => {
+  const {calcUsage} = useAccountContext();
   const [fileEntry, setFileEntry] = useState<FileEntry | null>(null); // [file, setFile
   const [contents, setContents] = useState<string>('');
-  const {data: fileList} = useFileList(userInfo, signature);
+  const [data, setData] = useState<UserData>({files: [], size: 0});
+
+  useEffect(() => {
+    if (signature) {
+      fetch(`http://localhost:8787`, {
+        method: 'GET',
+        headers: {
+          'X-User-Id': userInfo.user,
+          'X-Token-Id': userInfo.token,
+          'X-Signature': signature
+        }
+      }).then((response) => {
+        response.json().then((data) => {
+          if (data) {
+            setData(data);
+            calcUsage(data.size);
+          }
+        });
+      }).catch((error) => {
+        console.error(error);
+        // setError(true);
+      }).finally(() => {
+        // setLoading(false);
+      });
+    }
+
+  }, [signature]);
+
+  const uploadFiles = (files: any[]) => {
+    files.forEach((file) => {
+      blobToBase64(file).then((base64) => {
+        fetch(`http://localhost:8787`, {
+          method: 'PUT',
+          body: base64,
+          headers: {
+            'Content-Type': 'text/plain',
+            'Access-Control-Request-Headers': '*',
+            'X-User-Id': userInfo.user,
+            'X-Token-Id': userInfo.token,
+            'X-Signature': signature,
+            'X-File-Id': generateFileId(),
+            'X-File-Name': file!.name,
+            'X-File-Type': 'upload'
+          }
+        }).then((response) => {
+          response.json().then((resJson) => {
+            data.files.unshift(resJson);
+            setData({...data});
+          });
+        }).catch((error) => {
+          console.log(error);
+        });
+
+      });
+    });
+  };
 
   const openFile = (file: FileEntry) => {
-    setFileEntry(file);
+    if (timeout) {
+      clearTimeout(timeout);
+      saveNow();
+    }
 
-    if (!file.size) {
+    if (!file.size || file.type === 'upload') {
+      setFileEntry(file);
       setContents('');
       return;
     }
+
+    setFileEntry(null);
+    setContents('');
+
     fetch(`http://localhost:8787`, {
       method: 'GET',
       headers: {
@@ -29,6 +97,7 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
     }).then((response) => {
       response.text().then((text) => {
         const [type, content] = base64UrlToString(text);
+        setFileEntry(file);
         setContents(content);
       });
       // response.blob().then((blob) => {
@@ -40,36 +109,57 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
   };
 
   const onTitleChange = (e) => {
-    setFileEntry({...fileEntry, name: e.target.value});
-    saveFile(contents, e.target.value);
-  };
-
-  const saveFile = (newData: string, name?: string) => {
+    fileEntry.name = e.target.value;
+    setFileEntry({...fileEntry});
+    newestTitle = e.target.value;
     if (timeout) {
       clearTimeout(timeout);
     }
     timeout = setTimeout(() => {
-      const base64 = stringToBase64Url(newData);
-      fetch(`http://localhost:8787`, {
-        method: 'PUT',
-        body: base64,
-        headers: {
-          'Content-Type': 'text/plain',
-          'Access-Control-Request-Headers': '*',
-          'X-User-Id': userInfo.user,
-          'X-Token-Id': userInfo.token,
-          'X-Signature': signature,
-          'X-File-Id': fileEntry?.id || '',
-          'X-File-Name': name || fileEntry?.name
-        }
-      }).then((response) => {
-        console.log(response);
-      }).catch((error) => {
-        console.log(error);
-      });
+      saveNow();
+    }, 2000);
+  };
+
+  const saveFile = (newData: string) => {
+    newestData = newData;
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(() => {
+      saveNow();
     }, 3000);
+  };
 
+  const saveNow = () => {
+    timeout = null;
+    const base64 = stringToBase64Url(newestData || contents);
+    fetch(`http://localhost:8787`, {
+      method: 'PUT',
+      body: base64,
+      headers: {
+        'Content-Type': 'text/plain',
+        'Access-Control-Request-Headers': '*',
+        'X-User-Id': userInfo.user,
+        'X-Token-Id': userInfo.token,
+        'X-Signature': signature,
+        'X-File-Id': fileEntry?.id || '',
+        'X-File-Name': newestTitle || fileEntry?.name,
+        'X-File-Type': fileEntry?.type
+      }
+    }).then((response) => {
+      response.json().then((resJson) => {
+        const index = data.files.findIndex((file) => file.id === resJson?.id);
+        if (index > -1) {
+          data.files[index] = resJson;
+        }
+        setData({...data});
+      });
 
+    }).catch((error) => {
+      console.log(error);
+    });
+    newestData = null;
+    newestTitle = null;
   };
 
   const deleteSelected = () => {
@@ -83,34 +173,76 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
     // }
   };
 
-  const newExcalidraw = () => {
-    const newFile: FileEntry = {name: 'New Excalidraw', type: 'excalidraw'};
-    openFile(newFile);
+  const deleteFile = () => {
+    if (timeout) {
+      clearTimeout(timeout);
+      newestData = null;
+      newestTitle = null;
+    }
+    const id = fileEntry.id;
+    fetch(`http://localhost:8787`, {
+      method: 'POST',
+      body: JSON.stringify({ids: [id]}),
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Request-Headers': '*',
+        'X-User-Id': userInfo.user,
+        'X-Token-Id': userInfo.token,
+        'X-Signature': signature
+      }
+    }).then((response) => {
+
+    }).catch((error) => {
+      console.log(error);
+    });
+    data.files.splice(data.files.findIndex((file) => file.id === id), 1);
+    setData({...data});
+    setFileEntry(null);
+    setContents('');
   };
 
-  const newQuill = () => {
-    const newFile: FileEntry = {name: new Date().toLocaleString(), type: 'text'};
+  const newEditor = (type: string) => {
+    const newFile: FileEntry = {id: generateFileId(), name: new Date().toLocaleString(), type};
     openFile(newFile);
-    fileList.unshift(newFile);
+    data.files.unshift(newFile);
+  };
+
+  const openFileDialog = () => {
+    triggerFileUpload().then((files) => {
+      uploadFiles(files);
+    });
   };
 
   return (
-      <div className={manageAccount ? 'hidden' : 'flex-grow flex border-t'}>
-        <div className="w-1/4">
-          <div className="toolbar">
-            <button className="fa-solid fa-trash" onClick={deleteSelected}/>
-            <button className="fa-solid fa-pen" onClick={newExcalidraw}/>
-            <button className="fa-solid fa-pencil" onClick={newQuill}/>
-          </div>
-          <SideList data={fileList} openFile={openFile}/>
+    <div className={manageAccount ? 'hidden' : 'flex-grow flex'}>
+      <div className="w-1/4">
+        <div className="border-b flex items-center text-center">
+          <div className="px-5">Create New →</div>
+          {/*<button className="fa-solid fa-trash" onClick={deleteSelected}/>*/}
+          <button className="border-l border-r p-3 hover:bg-neutral-950 fa-solid fa-diagram-project"
+                  onClick={() => newEditor('excalidraw')}/>
+          <button className="border-r p-3 fa-solid hover:bg-neutral-950 fa-file-word" onClick={() => newEditor('quill')}/>
+          <button className="border-r p-3 fa-solid hover:bg-neutral-950 fa-file-upload" onClick={openFileDialog}/>
         </div>
-        <div className="flex-grow border-l">
-          {/*<FilePreview userInfo={userInfo} signature={signature} file={file}/>*/}
-          <input type="text" value={fileEntry?.name || ''} onChange={onTitleChange}
-                 className="bg-inherit border-0 text-2xl px-5 py-2 w-full outline-0"/>
-          <FileEditor file={fileEntry} contents={contents} saveFile={saveFile}/>
-        </div>
+        <FileDrop onDrop={uploadFiles}>
+          <SideList data={data.files} openFile={openFile} selected={fileEntry}/>
+        </FileDrop>
       </div>
+      <div className="flex-grow border-l flex flex-col">
+        {fileEntry &&
+          <>
+            <div className="border-b flex items-center text-center">
+              <input type="text" value={fileEntry?.name || ''} onChange={onTitleChange}
+                     className="bg-inherit border-0 text-2xl px-5 py-2 w-full outline-0"/>
+              <DeleteMenu onDelete={deleteFile}/>
+            </div>
+
+            <FileEditor file={fileEntry} contents={contents} saveFile={saveFile}/>
+          </>
+        }
+
+      </div>
+    </div>
   );
 };
 

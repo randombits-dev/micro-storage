@@ -5,6 +5,8 @@ export interface Env {
 
 interface UserObj {
   files: { id: string, name: string, size: number }[];
+  size: number;
+  limit: number;
 }
 
 export default {
@@ -21,6 +23,8 @@ export default {
     switch (request.method) {
       case 'GET':
         return handleGet(request, env, ctx);
+      case 'POST':
+        return handlePost(request, env, ctx);
       case 'DELETE':
         return handleDelete(request, env, ctx);
       default:
@@ -35,14 +39,13 @@ export default {
 };
 
 async function handleGet(request: Request, env: Env, ctx: ExecutionContext) {
-  const userId = request.headers.get('X-User-Id');
-
+  const userId = new URL(request.url).pathname.substring(1);
   const userObj: UserObj | undefined = await env.STORAGE_1.get(userId!).then(r2Obj => r2Obj?.json());
   if (!userObj) {
     return new Response('Object Not Found', {status: 404});
   }
 
-  return new Response(JSON.stringify(userObj), {
+  return new Response(userObj.size, {
     status: 200
   });
 }
@@ -63,5 +66,20 @@ async function handleDelete(request: Request, env: Env, ctx: ExecutionContext) {
 
   return new Response(JSON.stringify({success: true}), {
     status: 200
+  });
+}
+
+async function handlePost(request: Request, env: Env, ctx: ExecutionContext) {
+  const body = request.json();
+
+  let userObj: UserObj | undefined = await env.STORAGE_1.get(body.id).then(r2Obj => r2Obj?.json());
+  
+  if (!userObj) {
+    userObj = {files: [], size: 0, limit: body.limit * 1024 * 1024};
+    env.STORAGE_1.put(body.id, JSON.stringify(userObj));
+  }
+
+  return new Response(null, {
+    status: 204
   });
 }

@@ -20,7 +20,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const storageResult = await deploy('MicroStorage', {
     contract: 'MicroStorage',
     from: deployer,
-    args: [usdc.address],
+    args: [usdc.address, BigInt(1), encodeBytes32String('local-functions-testnet')],
     log: true,
   });
 

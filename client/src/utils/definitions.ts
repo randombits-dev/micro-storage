@@ -8,6 +8,11 @@ export interface UserInfo {
   expired: boolean;
 }
 
+export interface UserData {
+  files: FileEntry[];
+  size: number;
+}
+
 export interface FileEntry {
   id?: string;
   name: string;

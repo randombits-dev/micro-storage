@@ -16,7 +16,10 @@ const Instructions = ({}: Props) => {
 
   const renderSub = () => {
     return <div className="border rounded-lg overflow-hidden my-5">
-      <div className="text-3xl font-bold bg-neutral-200 text-neutral-800 p-3">Subscribe</div>
+      <div className="text-3xl font-bold bg-neutral-200 text-neutral-800 p-3 flex items-center">
+        <div className="flex-grow">Subscribe</div>
+        {userInfo?.token && <div className="fas fa-check-circle text-green-800"></div>}
+      </div>
       {
         userInfo?.token ? <div className="p-5">
           <div>Your subscription ends {formatExpires(new Date(userInfo?.expires))}</div>
@@ -29,23 +32,35 @@ const Instructions = ({}: Props) => {
   };
 
 
-  return <div className="w-[500px] mx-auto py-20">
-    <div className="border rounded-lg overflow-hidden my-5">
-      <div className="text-3xl font-bold bg-neutral-200 text-neutral-800 p-3">Connect Wallet</div>
-      <div className="p-5">
-        <CustomWalletButton/>
-      </div>
+  return <div>
+    <div className="container mx-auto flex items-center">
+      <img src="/logo.png" className="w-20 h-20 mx-auto invert" alt="logo"/>
+      <div className="text-3xl flex-grow">Micro Storage</div>
     </div>
-    {address && renderSub()}
+    <div className="w-[500px] mx-auto py-20">
+      <div className="text-2xl font-bold text-center">Perform the following steps to get started:</div>
 
-    {userInfo?.token && <div className="border rounded-lg overflow-hidden my-5">
-      <div className="text-3xl font-bold bg-neutral-200 text-neutral-800 p-3">Sign to Login</div>
-      <div className="p-5">
-        <ActionButton handleClick={() => signMessage()}>Sign In
-        </ActionButton>
+      <div className="border rounded-lg overflow-hidden my-5">
+        <div className="text-3xl font-bold bg-neutral-200 text-neutral-800 p-3 flex items-center">
+          <div className="flex-grow">Connect Wallet</div>
+          {address && <div className="fas fa-check-circle text-green-800"></div>}
+        </div>
+        <div className="p-5">
+          <CustomWalletButton/>
+        </div>
       </div>
-    </div>}
+      {address && renderSub()}
 
+      {userInfo?.token && <div className="border rounded-lg overflow-hidden my-5">
+        <div className="text-3xl font-bold bg-neutral-200 text-neutral-800 p-3">Sign to Login</div>
+        <div className="p-5">
+          <ActionButton handleClick={() => signMessage()}>Sign In
+          </ActionButton>
+        </div>
+      </div>}
+
+    </div>
+    ;
   </div>;
 };
 

@@ -36,9 +36,9 @@ const QuillEditor = ({data, saveFile}) => {
   }, [data]);
 
   return (
-      <div>
-        <div id="quill"></div>
-      </div>
+    <div className="flex flex-col h-full">
+      <div className="flex-grow" id="quill"></div>
+    </div>
   );
 };
 

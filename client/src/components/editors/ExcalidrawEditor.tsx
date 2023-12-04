@@ -2,8 +2,11 @@ import React from 'react';
 import {Excalidraw, getSceneVersion} from "@excalidraw/excalidraw";
 
 const ExcalidrawEditor = ({data, saveFile}) => {
-  if (!data) {
-    data = {
+  let parsedData;
+  if (data) {
+    parsedData = JSON.parse(data);
+  } else {
+    parsedData = {
       elements: [],
       appState: {},
       libraryItems: [],
@@ -11,8 +14,10 @@ const ExcalidrawEditor = ({data, saveFile}) => {
     };
   }
 
-  let lastVersion = getSceneVersion(data.elements);
-  let libraryCnt = data.libraryItems?.length || 0;
+  console.log(parsedData);
+
+  let lastVersion = getSceneVersion(parsedData.elements);
+  let libraryCnt = parsedData.libraryItems?.length || 0;
 
   const UIOptions = {
     canvasActions: {
@@ -24,12 +29,12 @@ const ExcalidrawEditor = ({data, saveFile}) => {
     const newVersion = getSceneVersion(elements);
     if (newVersion > lastVersion) {
       lastVersion = newVersion;
-      data.elements = elements;
+      parsedData.elements = elements;
       if (Object.keys(files).length !== 0) {
         //non empty files
         // data.files = files;
       }
-      saveFile(JSON.stringify(data));
+      saveFile(JSON.stringify(parsedData));
     }
   };
 
@@ -42,11 +47,11 @@ const ExcalidrawEditor = ({data, saveFile}) => {
   };
 
   return (
-      <div className="h-[500px]">
-        <Excalidraw key={Math.random()} initialData={data} theme={'dark'} onChange={onChange}
-                    onLibraryChange={onLibraryChange}
-                    UIOptions={UIOptions}/>
-      </div>
+    <div className="h-[500px]">
+      <Excalidraw key={Math.random()} initialData={parsedData} theme={'dark'} onChange={onChange}
+                  onLibraryChange={onLibraryChange}
+                  UIOptions={UIOptions}/>
+    </div>
   );
 };
 

@@ -1,9 +1,9 @@
 import {useEffect, useState} from 'react';
-import {FileEntry, UserInfo} from '../utils/definitions.ts';
+import {UserData, UserInfo} from '../utils/definitions.ts';
 import {base64UrlToString, blobToBase64} from '../utils/fileUtils.ts';
 
 export const useFileList = (userInfo: UserInfo, signature: string) => {
-  const [data, setData] = useState<FileEntry[]>([]);
+  const [data, setData] = useState<UserData>({files: [], size: 0});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   useEffect(() => {
@@ -17,7 +17,7 @@ export const useFileList = (userInfo: UserInfo, signature: string) => {
         }
       }).then((response) => {
         response.json().then((data) => {
-          setData(data?.files || []);
+          setData(data || {});
         });
       }).catch((error) => {
         console.error(error);

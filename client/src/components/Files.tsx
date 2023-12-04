@@ -13,15 +13,15 @@ const Files = ({userInfo, signature}: Props) => {
   const [manageAccount, setManageAccount] = useState(false);
 
   return (
-      <div
-          className={"flex flex-col min-h-screen bg-neutral-900 main-container text-neutral-300"}>
-        <Navbar userInfo={userInfo} signature={signature} manageAccount={() => setManageAccount(true)}/>
-        {manageAccount && <ManageAccount back={() => setManageAccount(false)}/>}
+    <div
+      className={"flex flex-col min-h-screen bg-neutral-900 main-container text-neutral-300"}>
+      <Navbar userInfo={userInfo} signature={signature} manageAccount={() => setManageAccount(!manageAccount)}/>
+      {manageAccount && <ManageAccount back={() => setManageAccount(false)}/>}
 
-        <FileContainer userInfo={userInfo} signature={signature} manageAccount={manageAccount}/>
+      <FileContainer userInfo={userInfo} signature={signature} manageAccount={manageAccount}/>
 
 
-      </div>
+    </div>
 
   );
 };
