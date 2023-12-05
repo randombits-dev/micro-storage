@@ -49,7 +49,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const storageResult = await deploy('MicroStorage', {
     contract: 'MicroStorage',
     from: deployer,
-    args: [usdc.address, routerResult.address, BigInt(1), encodeBytes32String('local-functions-testnet')],
+    args: [usdc.address, routerResult.address, BigInt(1), encodeBytes32String('local-functions-testnet'),
+      '0xd70df55841917793295276a07909f7080303d54fc46271d5b1d3a81018c8deedd04d0975c555e3aa90605d559ded4e791581b2927763409e9b13814ac2617d19a177052153c4082133e162f7af8f60ac37f9727f87820e7e0376b508ce44c5a9c94b3ccc0d14958607bfafff4f1c63fe0a6db44ccdcb298b709681d61521cb26897c0015d542c6de6b3b8d305def933aceb587cdeb15b758317ce6c3bd4f26b51e'],
     log: true,
   });
 

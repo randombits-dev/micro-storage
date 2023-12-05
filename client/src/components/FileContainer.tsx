@@ -6,6 +6,7 @@ import {FileEntry, UserData} from "../utils/definitions.ts";
 import {base64UrlToString, blobToBase64, generateFileId, stringToBase64Url, triggerFileUpload} from "../utils/fileUtils.ts";
 import {useAccountContext} from "../providers/AccountProvider.tsx";
 import DeleteMenu from "./common/DeleteMenu.tsx";
+import {WorkerUrl} from "../utils/network.ts";
 
 let timeout;
 let newestData;
@@ -18,7 +19,7 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
 
   useEffect(() => {
     if (signature) {
-      fetch(`http://localhost:8787`, {
+      fetch(WorkerUrl, {
         method: 'GET',
         headers: {
           'X-User-Id': userInfo.user,
@@ -45,7 +46,7 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
   const uploadFiles = (files: any[]) => {
     files.forEach((file) => {
       blobToBase64(file).then((base64) => {
-        fetch(`http://localhost:8787`, {
+        fetch(WorkerUrl, {
           method: 'PUT',
           body: base64,
           headers: {
@@ -86,7 +87,7 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
     setFileEntry(null);
     setContents('');
 
-    fetch(`http://localhost:8787`, {
+    fetch(WorkerUrl, {
       method: 'GET',
       headers: {
         'X-File-Id': file.id,
@@ -133,7 +134,7 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
   const saveNow = () => {
     timeout = null;
     const base64 = stringToBase64Url(newestData || contents);
-    fetch(`http://localhost:8787`, {
+    fetch(WorkerUrl, {
       method: 'PUT',
       body: base64,
       headers: {
@@ -180,7 +181,7 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
       newestTitle = null;
     }
     const id = fileEntry.id;
-    fetch(`http://localhost:8787`, {
+    fetch(WorkerUrl, {
       method: 'POST',
       body: JSON.stringify({ids: [id]}),
       headers: {

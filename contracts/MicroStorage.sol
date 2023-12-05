@@ -1,9 +1,4 @@
-// SPDX-License-Identifier: MIT
-
 pragma solidity 0.8.19;
-
-// TODO: Remove this
-import "hardhat/console.sol";
 
 import "./IERC4907.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
@@ -15,6 +10,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/FunctionsClient.sol";
 import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol";
+import {MicroStorageSource} from './MicroStorageSource.sol';
 
 contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, FunctionsClient {
   using FunctionsRequest for FunctionsRequest.Request;
@@ -48,6 +44,7 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
   address private devAddress;
   uint64 private subId = 0;
   bytes32 private donId = 0x0;
+  bytes private secrets;
 //  MicroConsumer consumer;
 
   mapping(uint256 => UserInfo) private _userInfo;
@@ -55,11 +52,12 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
   event Subscribe(uint256 tokenId);
   event LimitChanged(uint256 tokenId);
 
-  constructor(address _paymentCoin, address _router, uint64 _subId, bytes32 _donId) ERC721("MicroStorage", "MicroStorage") FunctionsClient(_router) {
+  constructor(address _paymentCoin, address _router, uint64 _subId, bytes32 _donId, bytes memory _secrets) ERC721("MicroStorage", "MicroStorage") FunctionsClient(_router) {
     paymentCoin = _paymentCoin;
     devAddress = msg.sender;
     subId = _subId;
     donId = _donId;
+    secrets = _secrets;
   }
 
   function userInfo(uint256 tokenId) external view returns (UserInfo memory, bool) {
@@ -91,9 +89,9 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
     info.expires = uint64(block.timestamp + timeRequested);
     info.payment = amount;
     info.size = size;
+    sendRequest(nftId, size, 0, MicroStorageSource.postRequest);
+
     nftId++;
-//    string memory souce = 'const result = await Functions.makeHttpRequest({url: \'http://10.2.0.2:8787/' + msg.sender + '\',method: \"POST\"});return true;';
-//    sendRequest(tokenId, size, 0, source);
   }
 
   function extend(uint256 tokenId, uint256 amount) external {
@@ -119,19 +117,22 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
     tk.transferFrom(msg.sender, address(this), amount);
     user.payment += amount;
     user.size = size;
+    sendRequest(nftId, size, 1, MicroStorageSource.postRequest);
   }
 
-  function reduce(uint256 tokenId, uint256 size, string memory source) external {
-//    string memory souce = 'const result = await Functions.makeHttpRequest({url: \'http://10.2.0.2:8787/' + msg.sender + '\',method: \"DELETE\"});return true;';
-    sendRequest(tokenId, size, 1, source);
+  function reduce(uint256 tokenId, uint256 size) external {
+    sendRequest(tokenId, size, 2, MicroStorageSource.postRequest);
   }
 
   function sendRequest(uint256 tokenId, uint256 limit, uint8 op, string memory source) internal {
     FunctionsRequest.Request memory req;
     req.initializeRequestForInlineJavaScript(source);
-    string[] memory args = new string[](2);
-    args[0] = Strings.toString(tokenId);
-    args[1] = Strings.toString(limit);
+    req.addSecretsReference(secrets);
+
+    string[] memory args = new string[](3);
+    args[0] = Strings.toHexString(msg.sender);
+    args[1] = Strings.toString(tokenId);
+    args[2] = Strings.toString(limit);
     req.setArgs(args);
     bytes32 requestId = _sendRequest(req.encodeCBOR(), subId, uint32(300000), donId);
     _requestInfo[requestId] = RequestInfo(tokenId, op, limit);
@@ -145,7 +146,7 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
     bool success;
     (success) = abi.decode(response, (bool));
     RequestInfo memory info = _requestInfo[requestId];
-    if (info.op == 1) {
+    if (info.op == 2) {
       if (success) {
         UserInfo storage user = _userInfo[info.tokenId];
         uint256 secondsLeft = uint256(user.expires - block.timestamp);
@@ -170,6 +171,7 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
       user.payment -= creditsToGive;
     }
     _burn(tokenId);
+    sendRequest(tokenId, 0, 3, MicroStorageSource.postRequest);
   }
 
   function provideRefund(uint256 tokenId) external onlyOwner {

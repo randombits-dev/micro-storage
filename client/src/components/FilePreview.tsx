@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {base64UrlToString} from "../utils/fileUtils.ts";
 import {UserInfo} from "../utils/definitions.ts";
+import {WorkerUrl} from "../utils/network.ts";
 
 interface Props {
   file: File;
@@ -24,7 +25,7 @@ const FilePreview = ({file, userInfo, signature}: Props) => {
   }, [file]);
 
   const download = (file: any, callback: (type: string, content: string) => void) => {
-    fetch(`http://localhost:8787`, {
+    fetch(WorkerUrl, {
       method: 'GET',
       headers: {
         'X-File-Id': file.id,
@@ -46,7 +47,7 @@ const FilePreview = ({file, userInfo, signature}: Props) => {
   };
 
   return (
-      <div>{content}</div>
+    <div>{content}</div>
   );
 };
 

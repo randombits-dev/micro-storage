@@ -3,6 +3,7 @@ import {FileEntry} from "../../utils/definitions.ts";
 import {base64UrlToString, downloadFile} from "../../utils/fileUtils.ts";
 import {useAccountContext} from "../../providers/AccountProvider.tsx";
 import ActionButton from "../common/ActionButton.tsx";
+import {WorkerUrl} from "../../utils/network.ts";
 
 interface Props {
   file: FileEntry;
@@ -12,7 +13,7 @@ const UploadEditor = ({file}: Props) => {
   const {userInfo, signature} = useAccountContext();
 
   const download = () => {
-    fetch(`http://localhost:8787`, {
+    fetch(WorkerUrl, {
       method: 'GET',
       headers: {
         'X-File-Id': file.id,
