@@ -18,7 +18,7 @@ export default function WalletLayout({flex, children}: PropsWithChildren<{
     <WagmiConfig config={config}>
       <RainbowKitProvider chains={chains} modalSize="compact" theme={customRainbowTheme}>
         <AccountProvider>
-          <div className={"min-h-screen bg-neutral-900 main-container text-neutral-300"}>
+          <div className={"min-h-screen bg-gradient-to-tl from-cyan-100 to-pink-50 main-container text-neutral-800"}>
             {/*<div*/}
             {/*    className={"flex flex-col min-h-screen bg-neutral-900 main-container text-neutral-300" + extraClasses}>*/}
             {/*<MainContent>{children}</MainContent>*/}

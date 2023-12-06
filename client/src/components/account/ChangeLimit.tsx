@@ -6,6 +6,7 @@ import {useChangeLimit} from "../../hooks/useChangeLimit.ts";
 import {useEstimateIncreaseLimit} from "../../hooks/useEstimatePrice.ts";
 import {useAccountContext} from "../../providers/AccountProvider.tsx";
 import ContractWriteStatus from "../common/ContractWriteStatus.tsx";
+import Card from "../common/Card.tsx";
 
 interface Props {
 }
@@ -32,13 +33,13 @@ const ChangeLimit = ({}: Props) => {
 
   const writeButton = () => {
     if (error) {
-      return <button className="bg-neutral-800 px-10 py-3 w-full mt-5">{error}</button>;
+      return <ActionButton additionalClasses="mt-5" disabled={true}>{error}</ActionButton>;
     } else if (size > userInfo.size) {
       const approveText = enough ? 'USDC Approved' : `Allow MicroStorage to spend USDC`;
       return <div className="mt-5">
-        <ActionButton disabled={enough} handleClick={() => executeAllowance()}>{approveText}</ActionButton>
-        <ActionButton additionalClasses="mt-3"
-                      handleClick={() => execute()}>Increase Limit</ActionButton>
+        {!enough ? <ActionButton handleClick={() => executeAllowance()}>{approveText}</ActionButton>
+          : <ActionButton additionalClasses="mt-3"
+                          handleClick={() => execute()}>Increase Limit</ActionButton>}
       </div>;
     } else if (size < userInfo.size) {
       return <div className="mt-5">
@@ -46,7 +47,7 @@ const ChangeLimit = ({}: Props) => {
                       handleClick={() => execute()}>Decrease Limit</ActionButton>
       </div>;
     } else {
-      return <button className="bg-neutral-800 px-10 py-3 w-full mt-5">Limit is unchanged</button>;
+      return <ActionButton additionalClasses="mt-3" disabled={true}>Limit is unchanged</ActionButton>;
     }
   };
 
@@ -94,12 +95,12 @@ const ChangeLimit = ({}: Props) => {
     } else {
       return <>
         <div className="mb-5">Increase or Decrease your storage limit</div>
-        <TemplateSpec name="NEW LIMIT">
-          <input className="bg-neutral-900 w-20 px-5 py-1 mr-5 outline-0"
+        <TemplateSpec name="NEW LIMIT (GB)">
+          <input className="rounded-xl border border-dashed border-neutral-800 bg-inherit w-20 px-5 py-1 outline-0"
                  onChange={updateSize}
                  type="text"
                  value={size}
-          /> GB
+          />
         </TemplateSpec>
         <TemplateSpec name="CHANGE OF">{size - userInfo.size} GB</TemplateSpec>
         <TemplateSpec name="PRICE PER GB">0.001 USDC per GB per day</TemplateSpec>
@@ -110,12 +111,9 @@ const ChangeLimit = ({}: Props) => {
   };
 
   return (
-    <div className="border rounded-lg overflow-hidden my-5">
-      <div className="text-3xl font-bold bg-neutral-200 text-neutral-800 p-3">Change Limit</div>
-      <div className="p-5">
-        {writeContents()}
-      </div>
-    </div>
+    <Card title="Change Limit" isDone={false}>
+      {writeContents()}
+    </Card>
   );
 };
 

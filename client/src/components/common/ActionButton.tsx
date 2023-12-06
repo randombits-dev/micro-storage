@@ -8,14 +8,16 @@ interface Props {
 
 export const ActionButton = ({handleClick, children, disabled, additionalClasses = ''}: PropsWithChildren<Props>) => {
   if (!disabled) {
-    return <button className={'w-full bg-blue-900 px-5 py-3 hover:bg-blue-800 ' + additionalClasses}
-                   onClick={handleClick}>{children}</button>;
+    return <button
+      className={'w-full px-5 py-3 border border-neutral-800 font-bold dark-shadow rounded-3xl font-elegant ' + additionalClasses}
+      onClick={handleClick}>{children}</button>;
   } else {
-    return <button disabled={true} className={'w-full bg-neutral-800 px-5 py-3 ' + additionalClasses}
+    return <button disabled={true}
+                   className={'w-full border  rounded-3xl border-dashed border-neutral-800 px-5 py-3 font-elegant' + additionalClasses}
                    onClick={handleClick}>{children}</button>
       ;
   }
 
-}
+};
 
-export default ActionButton
+export default ActionButton;

@@ -51,6 +51,7 @@
   .btn {
     @apply bg-blue-900 px-10 py-3 hover:bg-blue-800;
   }
+
 }
 
 body {
@@ -68,6 +69,15 @@ body {
   transform: none !important;
 }
 
-input {
-  border: 1px solid #ccc;
+.dark-shadow {
+  box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, #171717 4px 6px 0px 0px, #171717 0px 6px 0px 0px;
+}
+
+.dark-shadow:hover {
+  box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, #171717 2px 4px 0px 0px, #171717 0px 4px 0px 0px;
+}
+
+
+.font-elegant {
+  font-family: 'Poiret One', sans-serif;
 }

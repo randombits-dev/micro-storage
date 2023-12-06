@@ -14,7 +14,7 @@ const Files = ({userInfo, signature}: Props) => {
 
   return (
     <div
-      className={"flex flex-col min-h-screen bg-neutral-900 main-container text-neutral-300"}>
+      className={"flex flex-col min-h-screen"}>
       <Navbar userInfo={userInfo} signature={signature} manageAccount={() => setManageAccount(!manageAccount)}/>
       {manageAccount && <ManageAccount back={() => setManageAccount(false)}/>}
 

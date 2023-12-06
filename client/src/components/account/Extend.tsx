@@ -6,6 +6,7 @@ import {useBalance} from "../../hooks/useBalance.ts";
 import TemplateSpec from "../TemplateSpec.tsx";
 import {useAccountContext} from "../../providers/AccountProvider.tsx";
 import ContractWriteStatus from "../common/ContractWriteStatus.tsx";
+import Card from "../common/Card.tsx";
 
 interface Props {
 }
@@ -46,9 +47,9 @@ const Extend = ({}: Props) => {
     } else {
       const approveText = enough ? 'USDC Approved' : `Allow MicroStorage to spend USDC`;
       return <div className="mt-5">
-        <ActionButton disabled={enough} handleClick={() => executeAllowance()}>{approveText}</ActionButton>
-        <ActionButton additionalClasses="mt-3" disabled={!enough}
-                      handleClick={() => execute()}>Pay {price} USDC</ActionButton>
+        {!enough ? <ActionButton handleClick={() => executeAllowance()}>{approveText}</ActionButton>
+          : <ActionButton additionalClasses="mt-3"
+                          handleClick={() => execute()}>Pay {price} USDC</ActionButton>}
       </div>;
     }
   };
@@ -88,7 +89,7 @@ const Extend = ({}: Props) => {
         <TemplateSpec name="PRICE PER DAY">{Math.round((0.01 + 0.001 * userInfo.size) * 1000) / 1000} per
           day</TemplateSpec>
 
-        <TemplateSpec name="DAYS"><input className="bg-neutral-900 w-20 px-5 py-1 outline-0"
+        <TemplateSpec name="DAYS"><input className="rounded-xl border border-dashed border-neutral-800 bg-inherit w-20 px-5 py-1 outline-0"
                                          onChange={updateDays}
                                          type="text"
                                          value={days}
@@ -105,12 +106,9 @@ const Extend = ({}: Props) => {
 
 
   return (
-    <div className="border rounded-lg overflow-hidden my-5">
-      <div className="text-3xl font-bold bg-neutral-200 text-neutral-800 p-3">Extend Subscription</div>
-      <div className="p-5">
-        {writeContents()}
-      </div>
-    </div>
+    <Card title="Extend Subscription" isDone={false}>
+      {writeContents()}
+    </Card>
   );
 };
 

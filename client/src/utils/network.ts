@@ -25,8 +25,8 @@ export const CURRENT_CHAIN = CHAINS[CHAIN_ID];
 export const MicroStorageAddress = MICRO_STORAGE_ADDRESSES[CHAIN_ID];
 export const USDCAddress = USDC_ADDRESSES[CHAIN_ID];
 
-export const WorkerUrl = 'http://localhost:8787';
-export const ChainLinkApiUrl = 'https://micro-storage-chainlink-api.mnienow.workers.dev';
+export const WorkerUrl = 'https://micro-storage-api.randombits.workers.dev';
+export const ChainLinkApiUrl = 'https://micro-storage-chainlink-api.randombits.workers.dev';
 
 export const createViemClient = () => {
   return createPublicClient({

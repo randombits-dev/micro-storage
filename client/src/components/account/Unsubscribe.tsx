@@ -5,6 +5,7 @@ import {useUnsubscribe} from "../../hooks/useUnsubscribe.ts";
 import {useEstimateRefund} from "../../hooks/useEstimateRefund.ts";
 import {useAccountContext} from "../../providers/AccountProvider.tsx";
 import ContractWriteStatus from "../common/ContractWriteStatus.tsx";
+import Card from "../common/Card.tsx";
 
 interface Props {
 }
@@ -29,12 +30,9 @@ const Unsubscribe = ({}: Props) => {
   };
 
   return (
-    <div className="border rounded-lg overflow-hidden my-5">
-      <div className="text-3xl font-bold bg-neutral-200 text-neutral-800 p-3">Unsubscribe</div>
-      <div className="p-5">
-        {writeContents()}
-      </div>
-    </div>
+    <Card title="Unsubscribe" isDone={false}>
+      {writeContents()}
+    </Card>
   );
 };
 

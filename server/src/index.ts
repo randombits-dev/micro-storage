@@ -18,17 +18,6 @@ const headers = {
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    // const url = new URL(request.url);
-    // const key = url.pathname.slice(1);
-
-    // if (request.method === 'GET') {
-    //   const path = new URL(request.url).pathname.substring(1);
-    //   if (path.length === 32) {
-    //     const file = await env.STORAGE_2.get(path);
-    //     return new Response(file.body, {headers: {'Content-Type': 'image/webp'}});
-    //   }
-    // }
-
     if (request.method === 'OPTIONS') {
       // Handle CORS preflight requests
       return handleOptions(request);
@@ -52,8 +41,6 @@ export default {
     if (!signatureValid) {
       return new Response('Not authorized', {status: 401, headers});
     }
-
-    console.log(request.method);
 
     switch (request.method) {
       case 'PUT':
@@ -158,8 +145,8 @@ async function handleGet(request: Request, env: Env, ctx: ExecutionContext) {
 
 async function handleDelete(request: Request, env: Env, ctx: ExecutionContext) {
   const userId = request.headers.get('X-User-Id');
-  const {ids: fileIds, all} = await request.json() as any;
-  if (!userId || (!fileIds && !all)) {
+  const {ids: fileIds} = await request.json() as any;
+  if (!userId || !fileIds || fileIds.length === 0) {
     return new Response('Invalid request', {status: 400, headers});
   }
   const userObj: UserObj | undefined = await env.STORAGE_1.get(userId).then(r2Obj => r2Obj?.json());
@@ -167,24 +154,15 @@ async function handleDelete(request: Request, env: Env, ctx: ExecutionContext) {
     return new Response('Object Not Found', {status: 404, headers});
   }
 
-  if (all) {
-    // delete everything
-    const allFileIds = userObj.files.map(file => file.id);
-    await Promise.all([
-      env.STORAGE_1.delete(userId),
-      env.STORAGE_2.delete(allFileIds)
-    ]);
-  } else {
-    userObj.files = userObj.files.filter(file => {
-      if (fileIds.includes(file.id)) {
-        userObj.size -= file.size;
-        return false;
-      }
-      return true;
-    });
-    await env.STORAGE_1.put(userId, JSON.stringify(userObj));
-    await env.STORAGE_2.delete(fileIds);
-  }
+  userObj.files = userObj.files.filter(file => {
+    if (fileIds.includes(file.id)) {
+      userObj.size -= file.size;
+      return false;
+    }
+    return true;
+  });
+  await env.STORAGE_1.put(userId, JSON.stringify(userObj));
+  await env.STORAGE_2.delete(fileIds);
 
   return new Response(null, {
     status: 200,

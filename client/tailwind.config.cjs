@@ -11,6 +11,11 @@ module.exports = {
       ...defaultTheme.screens,
       'xl': '5000px',
       '2xl': '5000px'
+    },
+    extend: {
+      borderColor: {
+        DEFAULT: 'rgb(38, 38, 38)',
+      },
     }
   },
   plugins: [
