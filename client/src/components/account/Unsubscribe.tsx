@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import TemplateSpec from "../TemplateSpec.tsx";
 import ActionButton from "../common/ActionButton.tsx";
 import {useUnsubscribe} from "../../hooks/useUnsubscribe.ts";
@@ -10,23 +10,14 @@ interface Props {
 }
 
 const Unsubscribe = ({}: Props) => {
-  const {userInfo, refetchToken} = useAccountContext();
+  const {userInfo} = useAccountContext();
 
   const {price: refundPrice, daysLeft} = useEstimateRefund(userInfo);
   const {execute: executeUnsub, status, statusMsg} = useUnsubscribe(userInfo?.token);
 
-  useEffect(() => {
-    if (status === 'success') {
-      void refetchToken();
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 5000);
-    }
-  }, [status]);
-
   const writeContents = () => {
     if (status) {
-      return <ContractWriteStatus status={status} statusMsg={status === 'success' ? 'Please Wait' : statusMsg}/>;
+      return <ContractWriteStatus status={status} statusMsg={status === 'success' ? 'Waiting on chainlink result' : statusMsg}/>;
     } else {
       return <>
         <div className="mb-5">Your files will be deleted. You will get a refund for unused time.</div>

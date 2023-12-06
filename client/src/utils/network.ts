@@ -12,7 +12,7 @@ const CHAINS: { [key: string]: any } = {
 
 const MICRO_STORAGE_ADDRESSES: { [key: string]: `0x${string}` } = {
   hardhat: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
-  'polygon-testnet': '0x0c3bAc47f2722278F2284B8e081557DD049Bc611',
+  'polygon-testnet': '0xadBC5Ec4b5b6362AF9f0A031670B6872d4ab4005',
   fantom: '0xC6537b534dEe49ff94A3193A65101f367c1C566A'
 };
 

@@ -1,12 +1,20 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import App from '../components/App.vue';
+import React from "react";
 ---
 
 <Layout title="Micro Storage">
-  <main>
-    <h1>micro-storage</h1>
-    <a href="/app">Start Here</a>
+  <main class="block bg-neutral-900 min-h-screen">
+    <header class="block pt-5">
+      <img src="/micro.png" alt="logo" width="300"/>
+
+    </header>
   </main>
 </Layout>
 
+<style>
+  html, body {
+    background-color: #171717;
+  }
+</style>

@@ -1,17 +1,15 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useEstimatePrice} from "../../hooks/useEstimatePrice.ts";
 import {useBalance} from "../../hooks/useBalance.ts";
 import ActionButton from "./../common/ActionButton.tsx";
 import {useSubscribe} from "../../hooks/useSubscribe.ts";
 import TemplateSpec from "./../TemplateSpec.tsx";
 import ContractWriteStatus from "./../common/ContractWriteStatus.tsx";
-import {useAccountContext} from "../../providers/AccountProvider.tsx";
 
 interface Props {
 }
 
 const Subscribe = (params: Props) => {
-  const {refetchToken} = useAccountContext();
   const [days, setDays] = useState(30);
   const [size, setSize] = useState(1);
   const [error, setError] = useState('');
@@ -27,12 +25,6 @@ const Subscribe = (params: Props) => {
     statusMsg,
     prepareError,
   } = useSubscribe('ipfs://bafkreibg6lnujfx67jrx6ppka5lt3vzrqug5g4mmfa6jes7szr2tv2oybu', amount || BigInt(0), size);
-
-  useEffect(() => {
-    if (status === 'success') {
-      void refetchToken();
-    }
-  }, [status]);
 
   const writeButton = () => {
     if (error) {
@@ -79,7 +71,9 @@ const Subscribe = (params: Props) => {
     }
   };
 
-  if (status && status !== 'success') {
+  if (status && status === 'success') {
+    return <ContractWriteStatus status={status} statusMsg="Waiting for chainlink result"/>;
+  } else if (status) {
     return <ContractWriteStatus status={status} statusMsg={statusMsg}/>;
   } else if (!enough && statusAllowance && statusAllowance !== 'success') {
     return <ContractWriteStatus status={statusAllowance} statusMsg={statusMsgAllowance}/>;

@@ -29,7 +29,6 @@ export const useMyAccount = () => {
     enabled: !!result
   });
 
-  console.log(userInfo);
   if (userInfo && Number(userInfo![0].size) > 0) {
     return {
       hasToken: true,

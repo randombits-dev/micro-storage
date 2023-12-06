@@ -10,9 +10,10 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/FunctionsClient.sol";
 import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol";
+import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
 import {MicroStorageSource} from './MicroStorageSource.sol';
 
-contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, FunctionsClient {
+contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, FunctionsClient, AutomationCompatibleInterface {
   using FunctionsRequest for FunctionsRequest.Request;
   using SafeMath for uint256;
 
@@ -49,8 +50,9 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
 
   mapping(uint256 => UserInfo) private _userInfo;
 
-  event Subscribe(uint256 tokenId);
-  event LimitChanged(uint256 tokenId);
+  event Subscribe(uint256 tokenId, address user);
+  event LimitChanged(uint256 tokenId, address user);
+  event Unsubscribe(uint256 tokenId, address user);
 
   constructor(address _paymentCoin, address _router, uint64 _subId, bytes32 _donId, bytes memory _secrets) ERC721("MicroStorage", "MicroStorage") FunctionsClient(_router) {
     paymentCoin = _paymentCoin;
@@ -83,7 +85,6 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
     tk.transferFrom(msg.sender, address(this), amount);
     _mint(msg.sender, nftId);
     _setTokenURI(nftId, metadata);
-    emit Subscribe(nftId);
     UserInfo storage info = _userInfo[nftId];
     info.user = msg.sender;
     info.expires = uint64(block.timestamp + timeRequested);
@@ -124,6 +125,20 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
     sendRequest(tokenId, size, 2, MicroStorageSource.postRequest);
   }
 
+  function unsubscribe(uint256 tokenId) external {
+    require(userOf(tokenId) == msg.sender, "caller is not owner");
+    UserInfo storage user = _userInfo[tokenId];
+    uint256 secondsLeft = uint256(user.expires - block.timestamp);
+    if (secondsLeft > 0) {
+      uint256 creditsToGive = secondsLeft.mul(pricePerDay.mul(user.size).add(basePrice)).div(86400);
+      IERC20 tk = IERC20(paymentCoin);
+      tk.transfer(msg.sender, creditsToGive);
+      user.payment -= creditsToGive;
+    }
+    sendRequest(tokenId, 0, 3, MicroStorageSource.postRequest);
+    _burn(tokenId);
+  }
+
   function sendRequest(uint256 tokenId, uint256 limit, uint8 op, string memory source) internal {
     FunctionsRequest.Request memory req;
     req.initializeRequestForInlineJavaScript(source);
@@ -141,46 +156,77 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
   function fulfillRequest(
     bytes32 requestId,
     bytes memory response,
-    bytes memory err
+    bytes memory
   ) internal override {
     bool success;
     (success) = abi.decode(response, (bool));
     RequestInfo memory info = _requestInfo[requestId];
-    if (info.op == 2) {
-      if (success) {
-        UserInfo storage user = _userInfo[info.tokenId];
-        uint256 secondsLeft = uint256(user.expires - block.timestamp);
+    if (success) {
+      UserInfo storage user = _userInfo[info.tokenId];
+      uint256 secondsLeft = uint256(user.expires - block.timestamp);
+      if (info.op == 0) {
+        emit Subscribe(info.tokenId, user.user);
+      } else if (info.op == 1) {
+        emit LimitChanged(info.tokenId, user.user);
+      } else if (info.op == 2) {
         uint256 creditsToGive = secondsLeft.mul(pricePerDay.mul(user.size - info.size)).div(86400);
         IERC20 tk = IERC20(paymentCoin);
         tk.transfer(user.user, creditsToGive);
         user.size = info.size;
         user.payment -= creditsToGive;
-
+        emit LimitChanged(info.tokenId, user.user);
+      } else if (info.op == 3) {
+        if (secondsLeft > 0) {
+          uint256 creditsToGive = secondsLeft.mul(pricePerDay.mul(user.size).add(basePrice)).div(86400);
+          IERC20 tk = IERC20(paymentCoin);
+          tk.transfer(msg.sender, creditsToGive);
+          user.payment -= creditsToGive;
+        }
+        emit Unsubscribe(info.tokenId, user.user);
+        _burn(info.tokenId);
+      } else if (info.op == 4) {
+        _burn(info.tokenId);
       }
     }
   }
 
-  function unsubscribe(uint256 tokenId) external {
-    require(userOf(tokenId) == msg.sender, "caller is not owner");
-    UserInfo storage user = _userInfo[tokenId];
-    uint256 secondsLeft = uint256(user.expires - block.timestamp);
-    if (secondsLeft > 0) {
-      uint256 creditsToGive = secondsLeft.mul(pricePerDay.mul(user.size).add(basePrice)).div(86400);
-      IERC20 tk = IERC20(paymentCoin);
-      tk.transfer(msg.sender, creditsToGive);
-      user.payment -= creditsToGive;
+  function checkUpkeep(bytes calldata)
+  external
+  view
+  override
+  returns (bool upkeepNeeded, bytes memory performData) {
+    // int256[] memory expired = [];
+    for (uint256 i = totalSupply(); i > 0; i--) {
+      uint256 tokenId = tokenByIndex(i - 1);
+      if (uint256(_userInfo[tokenId].expires) < block.timestamp) {
+        return (true, abi.encode(tokenId));
+      }
     }
-    _burn(tokenId);
-    sendRequest(tokenId, 0, 3, MicroStorageSource.postRequest);
+    // bool hasExpired = expired.length > 0;
+    // return (hasExpired, abi.encode(expired));
+    return (false, "");
   }
 
-  function provideRefund(uint256 tokenId) external onlyOwner {
-    UserInfo storage user = _userInfo[tokenId];
-    IERC20 tk = IERC20(paymentCoin);
-    tk.transfer(user.user, user.payment);
-    user.payment = 0;
-    _burn(tokenId);
+  function performUpkeep(bytes calldata performData) external override {
+    uint256 tokenId;
+    (tokenId) = abi.decode(performData, (uint256));
+    if (uint256(_userInfo[tokenId].expires) < block.timestamp) {
+      sendRequest(tokenId, 0, 4, MicroStorageSource.postRequest);
+    }
   }
+
+  function testExpire(uint256 tokenId) public {
+    UserInfo storage user = _userInfo[tokenId];
+    user.expires = uint64(block.timestamp);
+  }
+
+  // function provideRefund(uint256 tokenId) external onlyOwner {
+  //   UserInfo storage user = _userInfo[tokenId];
+  //   IERC20 tk = IERC20(paymentCoin);
+  //   tk.transfer(user.user, user.payment);
+  //   user.payment = 0;
+  //   _burn(tokenId);
+  // }
 
   function setUser(uint256, address, uint64) external pure override {
     revert("cannot change user");

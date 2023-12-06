@@ -2,15 +2,14 @@ import {useContractEvent, usePrepareContractWrite} from 'wagmi';
 import {microStorageABI} from '../generated';
 import {useContractWriteStatus} from './useContractWriteStatus';
 import {MicroStorageAddress} from '../utils/network';
-import {ReduceTestScript} from '../data/reduceScript.ts';
 import {useAllowance} from './useAllowance.ts';
 import {UserInfo} from '../utils/definitions.ts';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useAccountContext} from '../providers/AccountProvider.tsx';
 
 export const useChangeLimit = (userInfo: UserInfo, size: number, amount: bigint) => {
   const {refetchUserInfo} = useAccountContext();
-  const [complete, setComplete] = useState(false);
+  const [customStatus, setCustomStatus] = useState('');
   const {enough, execute: executeAllowance, status: statusAllowance, statusMsg: statusMsgAllowance, refetch} = useAllowance(amount);
 
   const {config: increaseConfig, error: increaseError} = usePrepareContractWrite({
@@ -26,26 +25,41 @@ export const useChangeLimit = (userInfo: UserInfo, size: number, amount: bigint)
     abi: microStorageABI,
     functionName: 'reduce',
     enabled: size < userInfo.size,
-    args: [BigInt(userInfo.token), BigInt(size), ReduceTestScript]
+    args: [BigInt(userInfo.token), BigInt(size)]
   });
   const {execute: executeIncrease, status: statusIncrease, statusMsg: statusMsgIncrease} = useContractWriteStatus(increaseConfig);
   const {execute: executeReduce, status: statusReduce, statusMsg: statusMsgReduce} = useContractWriteStatus(reduceConfig);
+
+  useEffect(() => {
+    if (statusIncrease === 'success') {
+      void refetchUserInfo();
+      setCustomStatus('success');
+    }
+  }, [statusIncrease]);
+
+  useEffect(() => {
+    if (statusReduce === 'success') {
+      setCustomStatus('waiting');
+    }
+  }, [statusReduce]);
 
   useContractEvent({
     address: MicroStorageAddress,
     abi: microStorageABI,
     eventName: 'LimitChanged',
-    listener: (tokenId) => {
-      if (tokenId === userInfo.token) {
-        void refetchUserInfo();
-        setComplete(true);
+    listener: (log) => {
+      if (log[0]) {
+        const tokenId = Number((log[0].args as any).tokenId);
+        if (tokenId === userInfo.token) {
+          void refetchUserInfo();
+          setCustomStatus('success');
+        }
       }
-
     }
   });
 
   const resetComplete = () => {
-    setComplete(false);
+    setCustomStatus('');
   };
 
   if (size > userInfo.size) {
@@ -58,7 +72,7 @@ export const useChangeLimit = (userInfo: UserInfo, size: number, amount: bigint)
       error: increaseError,
       status: statusIncrease,
       statusMsg: statusMsgIncrease,
-      complete,
+      customStatus,
       resetComplete
     };
   } else {
@@ -71,7 +85,7 @@ export const useChangeLimit = (userInfo: UserInfo, size: number, amount: bigint)
       error: reduceError,
       status: statusReduce,
       statusMsg: statusMsgReduce,
-      complete,
+      customStatus,
       resetComplete
     };
 

@@ -5,12 +5,15 @@ import {useAccount} from "wagmi";
 import {CustomWalletButton} from "./CustomWalletButton.tsx";
 import {formatExpires} from "../utils/dates.ts";
 import ActionButton from "./common/ActionButton.tsx";
+import GiveMe from "./account/GiveMe.tsx";
+import {useBalance} from "../hooks/useBalance.ts";
 
 interface Props {
 }
 
 const Instructions = ({}: Props) => {
 
+  const {balance} = useBalance();
   const {hasToken, userInfo, signMessage, hasSigned} = useAccountContext();
   const {address} = useAccount();
 
@@ -18,7 +21,7 @@ const Instructions = ({}: Props) => {
     return <div className="border rounded-lg overflow-hidden my-5">
       <div className="text-3xl font-bold bg-neutral-200 text-neutral-800 p-3 flex items-center">
         <div className="flex-grow">Subscribe</div>
-        {userInfo?.token && <div className="fas fa-check-circle text-green-800"></div>}
+        {hasToken && <div className="fas fa-check-circle text-green-800"></div>}
       </div>
       {
         hasToken ? <div className="p-5">
@@ -31,11 +34,25 @@ const Instructions = ({}: Props) => {
     </div>;
   };
 
+  const renderGiveMe = () => {
+    return <div className="border rounded-lg overflow-hidden my-5">
+      <div className="text-3xl font-bold bg-neutral-200 text-neutral-800 p-3 flex items-center">
+        <div className="flex-grow">Get Test USDC</div>
+        {Number(balance) && <div className="fas fa-check-circle text-green-800"></div>}
+      </div>
+      <div className="p-5">
+        <GiveMe/>
+      </div>
+    </div>;
+  };
+
 
   return <div>
-    <div className="container mx-auto flex items-center">
-      <img src="/logo.png" className="w-20 h-20 mx-auto invert" alt="logo"/>
-      <div className="text-3xl flex-grow">Micro Storage</div>
+    <div className="container mx-auto flex items-center justify-center">
+      <img src="/micro.png" alt="logo" width="400" className="mt-5"/>
+      {/*<img src="/logo.svg" className="w-28 h-28 mx-auto" alt="logo"/>*/}
+      {/*<div className="text-3xl flex-grow absolute top-5 left-5">Micro Storage</div>*/}
+
     </div>
     <div className="w-[500px] mx-auto py-20">
       <div className="text-2xl font-bold text-center">Perform the following steps to get started:</div>
@@ -49,6 +66,7 @@ const Instructions = ({}: Props) => {
           <CustomWalletButton/>
         </div>
       </div>
+      {address && renderGiveMe()}
       {address && renderSub()}
 
       {userInfo?.token && <div className="border rounded-lg overflow-hidden my-5">

@@ -284,6 +284,63 @@ export const aggregatorV3InterfaceABI = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// AutomationBase
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const automationBaseABI = [
+  { type: 'error', inputs: [], name: 'OnlySimulatedBackend' },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// AutomationCompatible
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const automationCompatibleABI = [
+  { type: 'error', inputs: [], name: 'OnlySimulatedBackend' },
+  {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    inputs: [{ name: 'checkData', internalType: 'bytes', type: 'bytes' }],
+    name: 'checkUpkeep',
+    outputs: [
+      { name: 'upkeepNeeded', internalType: 'bool', type: 'bool' },
+      { name: 'performData', internalType: 'bytes', type: 'bytes' },
+    ],
+  },
+  {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    inputs: [{ name: 'performData', internalType: 'bytes', type: 'bytes' }],
+    name: 'performUpkeep',
+    outputs: [],
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// AutomationCompatibleInterface
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const automationCompatibleInterfaceABI = [
+  {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    inputs: [{ name: 'checkData', internalType: 'bytes', type: 'bytes' }],
+    name: 'checkUpkeep',
+    outputs: [
+      { name: 'upkeepNeeded', internalType: 'bool', type: 'bool' },
+      { name: 'performData', internalType: 'bytes', type: 'bytes' },
+    ],
+  },
+  {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    inputs: [{ name: 'performData', internalType: 'bytes', type: 'bytes' }],
+    name: 'performUpkeep',
+    outputs: [],
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ConfirmedOwner
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -6696,11 +6753,14 @@ export const microStorageABI = [
     type: 'constructor',
     inputs: [
       { name: '_paymentCoin', internalType: 'address', type: 'address' },
+      { name: '_router', internalType: 'address', type: 'address' },
       { name: '_subId', internalType: 'uint64', type: 'uint64' },
       { name: '_donId', internalType: 'bytes32', type: 'bytes32' },
+      { name: '_secrets', internalType: 'bytes', type: 'bytes' },
     ],
   },
   { type: 'error', inputs: [], name: 'EmptyArgs' },
+  { type: 'error', inputs: [], name: 'EmptySecrets' },
   { type: 'error', inputs: [], name: 'EmptySource' },
   { type: 'error', inputs: [], name: 'NoInlineSecrets' },
   { type: 'error', inputs: [], name: 'OnlyRouterCanFulfill' },
@@ -6773,6 +6833,25 @@ export const microStorageABI = [
     anonymous: false,
     inputs: [
       {
+        name: 'tokenId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'user',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    name: 'LimitChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
         name: '_tokenId',
         internalType: 'uint256',
         type: 'uint256',
@@ -6804,19 +6883,6 @@ export const microStorageABI = [
     type: 'event',
     anonymous: false,
     inputs: [
-      {
-        name: 'value',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false,
-      },
-    ],
-    name: 'Reduce',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
       { name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true },
     ],
     name: 'RequestFulfilled',
@@ -6839,6 +6905,12 @@ export const microStorageABI = [
         type: 'uint256',
         indexed: false,
       },
+      {
+        name: 'user',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
     ],
     name: 'Subscribe',
   },
@@ -6856,6 +6928,25 @@ export const microStorageABI = [
       },
     ],
     name: 'Transfer',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'tokenId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'user',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    name: 'Unsubscribe',
   },
   {
     type: 'event',
@@ -6907,6 +6998,16 @@ export const microStorageABI = [
     inputs: [{ name: '_devAddress', internalType: 'address', type: 'address' }],
     name: 'changeDevAddress',
     outputs: [],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
+    name: 'checkUpkeep',
+    outputs: [
+      { name: 'upkeepNeeded', internalType: 'bool', type: 'bool' },
+      { name: 'performData', internalType: 'bytes', type: 'bytes' },
+    ],
   },
   {
     stateMutability: 'nonpayable',
@@ -7013,6 +7114,13 @@ export const microStorageABI = [
     outputs: [{ name: '', internalType: 'address', type: 'address' }],
   },
   {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    inputs: [{ name: 'performData', internalType: 'bytes', type: 'bytes' }],
+    name: 'performUpkeep',
+    outputs: [],
+  },
+  {
     stateMutability: 'view',
     type: 'function',
     inputs: [],
@@ -7022,17 +7130,9 @@ export const microStorageABI = [
   {
     stateMutability: 'nonpayable',
     type: 'function',
-    inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
-    name: 'provideRefund',
-    outputs: [],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
     inputs: [
       { name: 'tokenId', internalType: 'uint256', type: 'uint256' },
       { name: 'size', internalType: 'uint256', type: 'uint256' },
-      { name: 'source', internalType: 'string', type: 'string' },
     ],
     name: 'reduce',
     outputs: [],
@@ -7122,6 +7222,13 @@ export const microStorageABI = [
     inputs: [],
     name: 'symbol',
     outputs: [{ name: '', internalType: 'string', type: 'string' }],
+  },
+  {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
+    name: 'testExpire',
+    outputs: [],
   },
   {
     stateMutability: 'view',

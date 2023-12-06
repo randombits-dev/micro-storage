@@ -1,12 +1,15 @@
-import {usePrepareContractWrite} from 'wagmi';
+import {useAccount, useContractEvent, usePrepareContractWrite} from 'wagmi';
 import {microStorageABI} from '../generated';
 import {useContractWriteStatus} from './useContractWriteStatus';
 import {useEffect} from 'react';
 import {useAllowance} from './useAllowance';
 import {MicroStorageAddress} from '../utils/network';
+import {useAccountContext} from '../providers/AccountProvider.tsx';
 
 export const useSubscribe = (metadata: string | undefined, amount: bigint, size: number) => {
 
+  const {address} = useAccount();
+  const {refetchToken} = useAccountContext();
   const {enough, execute: executeAllowance, status: statusAllowance, statusMsg: statusMsgAllowance, refetch} = useAllowance(amount);
 
   useEffect(() => {
@@ -14,6 +17,20 @@ export const useSubscribe = (metadata: string | undefined, amount: bigint, size:
       void refetch();
     }
   }, [statusAllowance]);
+
+  useContractEvent({
+    address: MicroStorageAddress,
+    abi: microStorageABI,
+    eventName: 'Subscribe',
+    listener: (log) => {
+      if (log[0]) {
+        const userId = (log[0].args as any).user;
+        if (userId === address) {
+          void refetchToken();
+        }
+      }
+    }
+  });
 
   let contractDetails = {};
   if (enough) {

@@ -1,9 +1,12 @@
-import {usePrepareContractWrite} from 'wagmi';
+import {useAccount, useContractEvent, usePrepareContractWrite} from 'wagmi';
 import {microStorageABI} from '../generated';
 import {useContractWriteStatus} from './useContractWriteStatus';
 import {MicroStorageAddress} from '../utils/network';
+import {useAccountContext} from '../providers/AccountProvider.tsx';
 
 export const useUnsubscribe = (tokenId: number) => {
+  const {address} = useAccount();
+  const {refetchToken} = useAccountContext();
 
   // const [executing, setExecuting] = useState(false);
   const {config} = usePrepareContractWrite({
@@ -14,6 +17,24 @@ export const useUnsubscribe = (tokenId: number) => {
   });
 
   const {execute, status, statusMsg} = useContractWriteStatus(config);
+
+  useContractEvent({
+    address: MicroStorageAddress,
+    abi: microStorageABI,
+    eventName: 'Unsubscribe',
+    listener: (log) => {
+      if (log[0]) {
+        const userId = (log[0].args as any).user;
+        console.log('unsubscribe: ' + userId);
+        if (userId === address) {
+          void refetchToken();
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1000);
+        }
+      }
+    }
+  });
 
   return {execute, status, statusMsg};
 };

@@ -25,7 +25,7 @@ const ChangeLimit = ({}: Props) => {
     statusMsg,
     statusAllowance,
     statusMsgAllowance,
-    complete,
+    customStatus,
     resetComplete
   } = useChangeLimit(userInfo, size, amount);
 
@@ -79,12 +79,14 @@ const ChangeLimit = ({}: Props) => {
   };
 
   const writeContents = () => {
-    if (complete) {
+    if (customStatus === 'success') {
       return <div className="text-center">
         <div className="fas fa-check-circle text-green-800 text-5xl"></div>
         <div className="text-xl my-5">Successfully Changed Limit</div>
         <ActionButton handleClick={() => resetComplete()}>OK</ActionButton>
       </div>;
+    } else if (customStatus && customStatus !== 'success') {
+      return <ContractWriteStatus status={customStatus} statusMsg="Waiting for chainlink result"/>;
     } else if (status && status !== 'success') {
       return <ContractWriteStatus status={status} statusMsg={statusMsg}/>;
     } else if (!enough && statusAllowance && statusAllowance !== 'success') {
