@@ -1,20 +1,209 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import App from '../components/App.vue';
-import React from "react";
 ---
 
 <Layout title="Micro Storage">
-  <main class="block bg-neutral-900 min-h-screen">
-    <header class="block pt-5">
-      <img src="/micro.png" alt="logo" width="300"/>
+  <div class="text-neutral-800 min-h-screen bg-gradient-to-tl from-cyan-100 to-pink-50">
+    <!--<header class="pt-5 flex items-center">-->
+    <!--  <img src="/micro.png" alt="logo" width="300"/>-->
+    <!--  <a href="/app" class="text-xl ml-10">App</a>-->
+    <!--  <a href="/docs" class="text-xl ml-10">Docs</a>-->
+    <!--</header>-->
+    <div class="container mx-auto">
+      <div class="flex justify-center pt-10">
+        <img src="/logo-light.png" alt="logo" width="500" class="text-center"/>
+      </div>
 
-    </header>
-  </main>
+      <!--<div>-->
+      <!--  <div class="mt-28 font-bold text-center text-[50px]"><span class="font-cloud uppercase mr-10">Cloud Storage</span> x <span-->
+      <!--    class="ml-10 font-pixel uppercase">Blockchain</span>-->
+      <!--  </div>-->
+      <!--</div>-->
+      <div class="mt-20 text-center text-[60px]">
+        <div class="text-[140px] font-elegant leading-tight">Cloud Storage</div>
+        <div class="">x</div>
+        <div class="font-thick">Blockchain Subscription Management</div>
+      </div>
+      <div class="mt-20 font-elegant font-bold text-center text-[24px] text-neutral-950">Only pay for the storage you need. <br/>
+        Subscriptions
+        starting
+        at $0.011 per
+        day.
+      </div>
+
+      <!--<a href="/app"-->
+      <!--   class="dark-shadow rounded-2xl text-4xl inline-block border-amber-50 border px-10 py-3 bg-neutral-900 mt-10 hover:bg-neutral-950">Get-->
+      <!--  Started</a>-->
+      <div class="text-center font-elegant">
+        <a href="/app"
+           class="dark-shadow bg-neutral-100 rounded-2xl font-bold text-2xl inline-block px-10 py-3 border border-neutral-800 mt-10">Get
+          Started</a>
+        <a href="/docs"
+           class="ml-10 bg-neutral-100 dark-shadow rounded-2xl font-bold text-2xl inline-block px-10 py-3 border border-neutral-800 mt-10">Docs</a>
+      </div>
+
+
+    </div>
+
+    <div class="mt-20 pt-20 text-center border-t-2 border-neutral-800">
+      <div class="font-elegant text-8xl mb-32">How it works</div>
+      <div class="container mx-auto">
+        <div class="flex gap-8">
+          <div class="text-xl rounded-[30px] border-2 border-neutral-800 flex items-center relative">
+            <i class="fa-brands absolute left-[-2px] top-[-1px] fa-bitcoin text-6xl border-neutral-800 border-dashed"/>
+            <div class="text-3xl px-5 py-[10px] ml-16 ">Pay with Crypto</div>
+          </div>
+          <div class="text-xl rounded-[30px] border-2 border-neutral-800 flex items-center relative">
+            <i class="fas fa-file-word absolute left-[-2px] top-[-2px] text-[61px] border-neutral-800 border-dashed"/>
+            <div class="text-3xl px-5 py-[10.4px] ml-16 ">Create text documents</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-20 pt-20 border-t-2 border-neutral-800">
+      <div class="container mx-auto">
+        <div class="font-elegant text-8xl mb-32 text-center">Features</div>
+        <div class="grid grid-cols-2 gap-8">
+
+          <div class="text-xl rounded-3xl border-2 border-neutral-800 items-center">
+            <div class="border-b-2 border-neutral-800 flex items-center px-10 py-3">
+              <i class="fas fa-file-word text-4xl border-neutral-800 border-dashed"/>
+              <div class="text-3xl px-5 py-[10px] ml-4 ">Create text documents</div>
+            </div>
+            <div class="px-5 py-3">
+              <div class="text-3xl">
+                # Rich text documents
+              </div>
+              <div class="text-2xl">
+                ## with markdown shortcuts
+              </div>
+              <div>* Uses the quill text editor</div>
+            </div>
+          </div>
+
+          <div class="text-xl rounded-3xl border-2 border-neutral-800 items-center">
+            <div class="border-b-2 border-neutral-800 flex items-center px-10 py-3">
+              <i class="fas fa-diagram-project text-4xl border-neutral-800 border-dashed"/>
+              <div class="text-3xl px-5 py-[10px] ml-4 ">Create sketches</div>
+            </div>
+            <div class="px-5 py-3">
+              <div class="text-3xl">
+                # Rich text documents
+              </div>
+              <div class="text-2xl">
+                ## with markdown shortcuts
+              </div>
+              <div>* Uses the quill text editor</div>
+            </div>
+          </div>
+
+          <div class="text-xl rounded-3xl border-2 border-neutral-800 items-center">
+            <div class="border-b-2 border-neutral-800 flex items-center px-10 py-3">
+              <i class="fas fa-file-upload text-4xl border-neutral-800 border-dashed"/>
+              <div class="text-3xl px-5 py-[10px] ml-4 ">Upload files</div>
+            </div>
+            <div class="px-5 py-3">
+              <div class="text-3xl">
+                # Rich text documents
+              </div>
+              <div class="text-2xl">
+                ## with markdown shortcuts
+              </div>
+              <div>* Uses the quill text editor</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <footer class="bg-neutral-800 text-neutral-200">
+      <div class="footer-content py-28 mt-28 container mx-auto">
+
+        <div class="footer-section footer-logo">
+          <img src="/micro.png" alt="logo" width="400" class="text-center"/>
+
+
+          <!--<div>-->
+          <!--  <button class="hero-btn" id="jump-in-btn">Jump in &nbsp;&nbsp;&rarr;</button>-->
+
+          <!--</div>-->
+        </div>
+        <div class="footer-section">
+          <div class="footer-section-title">Docs</div>
+          <a href="/docs/intro">Intro</a>
+          <a href="/docs/2-getting-started">Getting Started</a>
+          <a href="/docs/3-using">Using the app</a>
+          <a href="/docs/4-managing">Managing your subscription</a>
+          <a href="/docs/5-contracts">Contracts</a>
+          <a href="/docs/8-technical">Technical Overview</a>
+          <a href="/docs/9-roadmap">Roadmap</a>
+        </div>
+        <div class="footer-section">
+          <div class="footer-section-title">Socials</div>
+          <a href="">Twitter (X)</a>
+          <a href="">Discord</a>
+          <a href="">Github</a>
+        </div>
+      </div>
+
+    </footer>
+
+  </div>
 </Layout>
 
 <style>
   html, body {
-    background-color: #171717;
+    font-family: 'Podkova', sans-serif;
+    background: url('/back.png');
   }
+
+  .dark-shadow {
+    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, #171717 4px 6px 0px 0px, #171717 0px 6px 0px 0px;
+  }
+
+  .dark-shadow:hover {
+    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, #171717 2px 4px 0px 0px, #171717 0px 4px 0px 0px;
+  }
+
+  .font-elegant {
+    font-family: 'Poiret One', sans-serif;
+  }
+
+  .font-shadow {
+    font-family: 'Londrina Shadow', cursive;
+  }
+
+  .font-thick {
+    font-family: 'Londrina Solid', cursive;
+  }
+
+  .footer-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    font-size: 16px;
+  }
+
+  .footer-section {
+    padding: 10px 20px;
+  }
+
+  .footer-section-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .footer-section a {
+    display: block;
+    text-decoration: none;
+    margin-bottom: 10px;
+  }
+
+  .footer-section a:hover {
+    text-decoration: underline;
+  }
+
 </style>

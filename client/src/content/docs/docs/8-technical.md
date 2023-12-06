@@ -5,6 +5,10 @@ description: Learn about the technical details of the project.
 
 # Technical Details
 
+## Architecture Diagram
+
+![Architecture Diagram](../../../assets/arch.png)
+
 ## Contract Interaction
 
 ### Creating subscriptions

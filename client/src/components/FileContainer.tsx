@@ -222,7 +222,7 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
           {/*<button className="fa-solid fa-trash" onClick={deleteSelected}/>*/}
           <button className="border-l border-r p-3 hover:bg-neutral-950 fa-solid fa-diagram-project"
                   onClick={() => newEditor('excalidraw')}/>
-          <button className="border-r p-3 fa-solid hover:bg-neutral-950 fa-file-word" onClick={() => newEditor('quill')}/>
+          <button className="border-r p-3 fa-solid hover:bg-neutral-950 fa-file-word" onClick={() => newEditor('text')}/>
           <button className="border-r p-3 fa-solid hover:bg-neutral-950 fa-file-upload" onClick={openFileDialog}/>
         </div>
         <FileDrop onDrop={uploadFiles}>

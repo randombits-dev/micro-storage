@@ -21,8 +21,10 @@ const SideList = ({data, openFile, selected}: Props) => {
     switch (file?.type) {
       case 'excalidraw':
         return <div className="fas fa-diagram-project"></div>;
-      default:
+      case 'text':
         return <div className="fas fa-file-word"></div>;
+      default:
+        return <div className="fas fa-file-upload"></div>;
     }
   };
 
