@@ -2,9 +2,8 @@ import {useSignMessage} from 'wagmi';
 import {hashMessage} from 'viem';
 import {useEffect, useState} from 'react';
 
-export const useServerSignature = ({token, onSign}: {
-  token?: number,
-  onSign?: () => void
+export const useServerSignature = ({token}: {
+  token?: number
 }) => {
   const hash = hashMessage(String(token || 0));
   const [signature, setSignature] = useState('');
@@ -14,7 +13,6 @@ export const useServerSignature = ({token, onSign}: {
     onSuccess: (data) => {
       sessionStorage.setItem('s.' + hash, data);
       setSignature(data);
-      onSign && onSign();
     }
   });
 

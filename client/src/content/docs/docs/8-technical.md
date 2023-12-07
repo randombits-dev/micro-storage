@@ -20,9 +20,10 @@ An example sequence diagram of creating a subscription, and the expiration of a 
 ### Creating subscriptions
 
 1. User calls `subscribe()` function of the contract, choosing the storage limit and subscription length.
-2. An NFT is minted that contains the storage limit and expiration date of the subscription.
-3. A request is sent to Chainlink Functions, which creates a new account for the user on the server.
-4. The user signs a message to prove ownership of the NFT, so they can communicate with the server API.
+2. Using price feeds, the user the subscription price is calculated and the user is charged.
+3. An NFT is minted that contains the storage limit and expiration date of the subscription.
+4. A request is sent to Chainlink Functions, which creates a new account for the user on the server.
+5. The user signs a message to prove ownership of the NFT, so they can communicate with the server API.
 
 ### Cancelling subscriptions
 
@@ -53,5 +54,7 @@ An example sequence diagram of creating a subscription, and the expiration of a 
 
 ## Automatic Subscription Termination
 
-If the user does not extend their subscription before it expires, the NFT will expire automatically. There is a **Chainlink Automation** job that will check for expired NFTs, and it will delete the NFT and send a request to **Chainlink Functions** to delete the user's account on the server.
+If the user does not extend their subscription before it expires, the NFT will expire automatically. There is a *
+*Chainlink Automation** job that will check for expired NFTs, and it will delete the NFT and send a request to *
+*Chainlink Functions** to delete the user's account on the server.
 

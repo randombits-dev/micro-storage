@@ -16,7 +16,7 @@ const Subscribe = (params: Props) => {
   const [size, setSize] = useState(1);
   const [error, setError] = useState('');
   const [coin, setCoin] = useState('0x326C977E6efc84E512bB9C30f76E30c160eD06FB');
-  const {priceFeed, formattedFeed} = usePriceFeed(coin);
+  const {formattedFeed} = usePriceFeed(coin);
   const {price, amount, usdPrice} = useEstimatePrice(coin, days, size);
   const {balance} = useBalance(coin);
   const {

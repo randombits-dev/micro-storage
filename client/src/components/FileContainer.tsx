@@ -3,7 +3,13 @@ import SideList from "./SideList.tsx";
 import FileDrop from "./FileDrop.tsx";
 import FileEditor from "./editors/FileEditor.tsx";
 import {FileEntry, UserData} from "../utils/definitions.ts";
-import {base64UrlToString, blobToBase64, generateFileId, stringToBase64Url, triggerFileUpload} from "../utils/fileUtils.ts";
+import {
+  base64UrlToString,
+  blobToBase64,
+  generateFileId,
+  stringToBase64Url,
+  triggerFileUpload
+} from "../utils/fileUtils.ts";
 import {useAccountContext} from "../providers/AccountProvider.tsx";
 import DeleteMenu from "./common/DeleteMenu.tsx";
 import {WorkerUrl} from "../utils/network.ts";
@@ -15,7 +21,8 @@ const FileContainer = ({manageAccount}) => {
   const {calcUsage, userInfo, signature} = useAccountContext();
   const [fileEntry, setFileEntry] = useState<FileEntry | null>(null); // [file, setFile
   const [contents, setContents] = useState<string>('');
-  const [data, setData] = useState<UserData>({files: [], size: 0});
+  const [data, setData] = useState<UserData>(null);
+  const [accountCreation, setAccountCreation] = useState(false);
 
   const updateFileList = () => {
     setData({...data});
@@ -25,28 +32,32 @@ const FileContainer = ({manageAccount}) => {
     calcUsage(newSize);
   };
 
+  const fetchFileList = () => {
+    fetch(WorkerUrl, {
+      method: 'GET',
+      headers: {
+        'X-User-Id': userInfo.user,
+        'X-Token-Id': userInfo.token,
+        'X-Signature': signature
+      }
+    }).then((response) => {
+      response.json().then((data) => {
+        if (data) {
+          setData(data);
+          calcUsage(data.size);
+        }
+      });
+    }).catch((error) => {
+      setAccountCreation(true);
+      setTimeout(() => {
+        fetchFileList();
+      }, 5000);
+    });
+  };
+
   useEffect(() => {
     if (signature) {
-      fetch(WorkerUrl, {
-        method: 'GET',
-        headers: {
-          'X-User-Id': userInfo.user,
-          'X-Token-Id': userInfo.token,
-          'X-Signature': signature
-        }
-      }).then((response) => {
-        response.json().then((data) => {
-          if (data) {
-            setData(data);
-            calcUsage(data.size);
-          }
-        });
-      }).catch((error) => {
-        console.error(error);
-        // setError(true);
-      }).finally(() => {
-        // setLoading(false);
-      });
+      fetchFileList();
     }
 
   }, [signature]);
@@ -216,47 +227,51 @@ const FileContainer = ({manageAccount}) => {
     });
   };
 
+  if (!data) {
+    return <div className="flex justify-center mt-40">
+      <div className="spinner"></div>
+      {accountCreation && <div>Creating account, please wait</div>}
+    </div>;
+  }
   return (
-    <div className={manageAccount ? 'hidden' : 'flex-grow flex'}>
-      <div className="w-1/4 flex flex-col">
-        <div className="text-center border-b border-dashed">↓ Create New Document ↓</div>
-        <div className="border-b-2  grid grid-cols-3 items-center text-center">
-          {/*<div className="px-5">Create New →</div>*/}
-          {/*<button className="fa-solid fa-trash" onClick={deleteSelected}/>*/}
-          <button className="border-r p-3 hover:bg-neutral-200 "
-                  onClick={() => newEditor('text')}>
-            <i className="fa-solid fa-file-word mr-3"/>
-            <span>Text</span>
-          </button>
-          <button className="border-r p-3 hover:bg-neutral-200 "
-                  onClick={() => newEditor('excalidraw')}><i className="fa-solid fa-diagram-project mr-3"/>
-            <span>Sketch</span>
-          </button>
+      <div className={manageAccount ? 'hidden' : 'flex-grow flex'}>
+        <div className="w-1/4 flex flex-col">
+          <div className="text-center border-b border-dashed">↓ Create New Document ↓</div>
+          <div className="border-b-2  grid grid-cols-3 items-center text-center">
+            <button className="border-r p-3 hover:bg-neutral-200 "
+                    onClick={() => newEditor('text')}>
+              <i className="fa-solid fa-file-word mr-3"/>
+              <span>Text</span>
+            </button>
+            <button className="border-r p-3 hover:bg-neutral-200 "
+                    onClick={() => newEditor('excalidraw')}><i className="fa-solid fa-diagram-project mr-3"/>
+              <span>Sketch</span>
+            </button>
 
-          <button className="p-3 hover:bg-neutral-200"
-                  onClick={openFileDialog}><i className="fa-solid fa-file-upload mr-3"/>
-            <span>Upload</span>
-          </button>
+            <button className="p-3 hover:bg-neutral-200"
+                    onClick={openFileDialog}><i className="fa-solid fa-file-upload mr-3"/>
+              <span>Upload</span>
+            </button>
+          </div>
+          <FileDrop onDrop={uploadFiles}>
+            <SideList data={data.files} openFile={openFile} selected={fileEntry}/>
+          </FileDrop>
         </div>
-        <FileDrop onDrop={uploadFiles}>
-          <SideList data={data.files} openFile={openFile} selected={fileEntry}/>
-        </FileDrop>
-      </div>
-      <div className="flex-grow border-l flex flex-col">
-        {fileEntry &&
-          <>
-            <div className="border-b flex items-center text-center">
-              <input type="text" value={fileEntry?.name || ''} onChange={onTitleChange}
-                     className="bg-inherit border-0 text-2xl px-5 py-2 w-full outline-0"/>
-              <DeleteMenu onDelete={deleteFile}/>
-            </div>
+        <div className="flex-grow border-l flex flex-col">
+          {fileEntry &&
+              <>
+                <div className="border-b flex items-center text-center">
+                  <input type="text" value={fileEntry?.name || ''} onChange={onTitleChange}
+                         className="bg-inherit border-0 text-2xl px-5 py-2 w-full outline-0"/>
+                  <DeleteMenu onDelete={deleteFile}/>
+                </div>
 
-            <FileEditor file={fileEntry} contents={contents} saveFile={saveFile}/>
-          </>
-        }
+                <FileEditor file={fileEntry} contents={contents} saveFile={saveFile}/>
+              </>
+          }
 
+        </div>
       </div>
-    </div>
   );
 };
 

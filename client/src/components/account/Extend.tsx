@@ -42,17 +42,24 @@ const Extend = ({}: Props) => {
 
   const writeButton = () => {
     if (error) {
-      return <button className="bg-neutral-800 px-10 py-3 w-full mt-5">{error}</button>;
+      return <ActionButton additionalClasses="mt-3"
+                           handleClick={() => {
+                           }} disabled={true}>{error}</ActionButton>;
     } else if (prepareError) {
-      return <button className="bg-neutral-800 px-10 py-3 w-full mt-5">Cannot extend past 30 days</button>;
+      return <ActionButton additionalClasses="mt-3"
+                           handleClick={() => {
+                           }} disabled={true}>Cannot extend past 30 days</ActionButton>;
     } else if (balance < (amount || 0)) {
-      return <button className="bg-neutral-800 px-10 py-3 w-full mt-5">Coin balance too low</button>;
+      return <ActionButton additionalClasses="mt-3"
+                           handleClick={() => {
+                           }} disabled={true}>Coin balance too low</ActionButton>;
     } else {
       return <div className="mt-5">
         {!enough ?
-          <ActionButton handleClick={() => executeAllowance()}>Allow MicroStorage to spend {COIN_LIST[userInfo.coin]}</ActionButton>
-          : <ActionButton additionalClasses="mt-3"
-                          handleClick={() => execute()}>Pay {price} {COIN_LIST[userInfo.coin]}</ActionButton>}
+            <ActionButton handleClick={() => executeAllowance()}>Allow MicroStorage to
+              spend {COIN_LIST[userInfo.coin]}</ActionButton>
+            : <ActionButton additionalClasses="mt-3"
+                            handleClick={() => execute()}>Pay {price} {COIN_LIST[userInfo.coin]}</ActionButton>}
       </div>;
     }
   };
@@ -93,14 +100,15 @@ const Extend = ({}: Props) => {
         <TemplateSpec name="PRICE PER DAY">{Math.round((0.01 + 0.001 * userInfo.size) * 1000) / 1000} USD per
           day</TemplateSpec>
 
-        <TemplateSpec name="DAYS"><input className="rounded-xl border border-dashed border-neutral-800 bg-inherit w-20 px-5 py-1 outline-0"
-                                         onChange={updateDays}
-                                         type="text"
-                                         value={days}
+        <TemplateSpec name="DAYS"><input
+            className="rounded-xl border border-dashed border-neutral-800 bg-inherit w-20 px-5 py-1 outline-0"
+            onChange={updateDays}
+            type="text"
+            value={days}
         />
         </TemplateSpec>
         <TemplateSpec
-          name="NEW EXPIRES">{new Date(userInfo.expires + days * 24 * 60 * 60 * 1000).toLocaleString()}</TemplateSpec>
+            name="NEW EXPIRES">{new Date(userInfo.expires + days * 24 * 60 * 60 * 1000).toLocaleString()}</TemplateSpec>
         <TemplateSpec name="TOTAL">{usdPrice} USD</TemplateSpec>
         <TemplateSpec name="COIN PRICE">{formattedFeed} USD</TemplateSpec>
         <TemplateSpec name="TOTAL IN COINS">{price} {COIN_LIST[userInfo.coin]}</TemplateSpec>
@@ -112,9 +120,9 @@ const Extend = ({}: Props) => {
 
 
   return (
-    <Card title="Extend Subscription" isDone={false}>
-      {writeContents()}
-    </Card>
+      <Card title="Extend Subscription" isDone={false}>
+        {writeContents()}
+      </Card>
   );
 };
 

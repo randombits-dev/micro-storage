@@ -46,19 +46,13 @@ export const useSubscribe = (coin: string, amount: bigint, size: number) => {
 
   const {execute, receipt, status, statusMsg} = useContractWriteStatus(config, {success: 'Reserving Server'});
 
-  // useEffect(() => {
-  //   if (status === 'success') {
-  //     const lastLog = receipt!.logs.pop();
-  //     const rentEvent = decodeEventLog({
-  //       abi: microStorageABI,
-  //       data: lastLog!.data,
-  //       topics: lastLog!.topics
-  //     });
-  //     const tokenId = Number((rentEvent.args as any).tokenId);
-  //     // void subscribed(tokenId);
-  //     // console.log(tokenId);
-  //   }
-  // }, [status]);
+  useEffect(() => {
+    if (status === 'success') {
+      setTimeout(() => {
+        void refetchToken();
+      }, 30000);
+    }
+  }, [status]);
 
   return {
     execute,

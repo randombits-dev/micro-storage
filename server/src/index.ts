@@ -60,9 +60,9 @@ export default {
 
 async function handleOptions(request: Request) {
   if (
-    request.headers.get('Origin') !== null &&
-    request.headers.get('Access-Control-Request-Method') !== null
-    // request.headers.get("Access-Control-Request-Headers") !== null
+      request.headers.get('Origin') !== null &&
+      request.headers.get('Access-Control-Request-Method') !== null
+      // request.headers.get("Access-Control-Request-Headers") !== null
   ) {
 
     const corsHeaders = {
@@ -76,7 +76,7 @@ async function handleOptions(request: Request) {
       headers: {
         ...corsHeaders,
         'Access-Control-Allow-Headers': request.headers.get(
-          'Access-Control-Request-Headers'
+            'Access-Control-Request-Headers'
         ),
       },
     });
@@ -145,7 +145,10 @@ async function handleGet(request: Request, env: Env, ctx: ExecutionContext) {
   }
 
   const userObj = await env.STORAGE_1.get(userId!);
-  return new Response(userObj?.body || JSON.stringify({files: [], size: 0}), {headers});
+  if (!userObj) {
+    return new Response('Object Not Found', {status: 404, headers});
+  }
+  return new Response(userObj?.body, {headers});
 }
 
 async function handleDelete(request: Request, env: Env, ctx: ExecutionContext) {

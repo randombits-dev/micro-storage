@@ -7,7 +7,7 @@ description: How to use Micro Storage
 
 The following types of documents are supported:
 
-* Text - A simple text document that supports Markdown shortcuts
+* Rich Text - A rich text document that supports Markdown shortcuts
 * Drawing - A sketchpad for drawing diagrams - uses the Excalidraw library
 
 ### Creating documents

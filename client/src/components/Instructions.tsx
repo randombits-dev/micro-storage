@@ -1,11 +1,10 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import Subscribe from "./account/Subscribe.tsx";
 import {useAccountContext} from "../providers/AccountProvider.tsx";
 import {useAccount} from "wagmi";
 import {CustomWalletButton} from "./CustomWalletButton.tsx";
 import {formatExpires} from "../utils/dates.ts";
 import ActionButton from "./common/ActionButton.tsx";
-import {useBalance} from "../hooks/useBalance.ts";
 import Card from "./common/Card.tsx";
 
 interface Props {
@@ -13,22 +12,21 @@ interface Props {
 
 const Instructions = ({}: Props) => {
 
-  const {balance} = useBalance();
   const {hasToken, userInfo, signMessage, refetchToken} = useAccountContext();
   const {address} = useAccount();
 
-  const checkForToken = () => {
-    refetchToken();
-    if (!hasToken) {
-      setTimeout(() => {
-        checkForToken();
-      }, 5000);
-    }
-  };
+  // const checkForToken = () => {
+  //   refetchToken();
+  //   if (!hasToken) {
+  //     setTimeout(() => {
+  //       checkForToken();
+  //     }, 5000);
+  //   }
+  // };
 
-  useEffect(() => {
-    checkForToken();
-  }, []);
+  // useEffect(() => {
+  //   checkForToken();
+  // }, []);
 
   const renderSub = () => {
 
