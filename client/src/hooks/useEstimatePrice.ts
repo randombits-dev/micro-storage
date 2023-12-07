@@ -27,24 +27,24 @@ export const useEstimateReduce = (userInfo: UserInfo, size: number) => {
   const {priceFeed} = usePriceFeed(userInfo.coin);
 
   const timeLeft = userInfo.expires - new Date().getTime();
-  const daysLeft = Math.floor(timeLeft / 1000 / 3600 / 24);
+  const daysLeft = timeLeft / 1000 / 3600 / 24;
 
-  const usdAmount = BigInt(daysLeft) * BigInt(userInfo.size - size) * BigInt('1000000000000000');
+  const usdAmount = BigInt(Math.floor(daysLeft * 100)) * BigInt(userInfo.size - size) * BigInt('1000000000000000') / BigInt(100);
   const amount = priceFeed > 0 ? BigInt('100000000') * usdAmount / priceFeed : BigInt(0);
   const price = formatUnits(amount, 18);
   const usdPrice = formatUnits(usdAmount, 18);
-  return {price, amount, usdPrice, usdAmount, daysLeft};
+  return {price, amount, usdPrice, usdAmount, daysLeft: daysLeft.toFixed(2)};
 };
 
 export const useEstimateRefund = (userInfo: UserInfo) => {
   const {priceFeed} = usePriceFeed(userInfo.coin);
 
   const timeLeft = userInfo.expires - new Date().getTime();
-  const daysLeft = Math.floor(timeLeft / 1000 / 3600 / 24);
+  const daysLeft = timeLeft / 1000 / 3600 / 24;
 
-  const usdAmount = BigInt(daysLeft) * (BigInt(userInfo.size) * BigInt('1000000000000000') + BigInt('10000000000000000'));
+  const usdAmount = BigInt(Math.floor(daysLeft * 100)) * (BigInt(userInfo.size) * BigInt('1000000000000000') + BigInt('10000000000000000')) / BigInt(100);
   const amount = priceFeed > 0 ? BigInt('100000000') * usdAmount / priceFeed : BigInt(0);
   const price = formatUnits(amount, 18);
   const usdPrice = formatUnits(usdAmount, 18);
-  return {price, amount, usdPrice, usdAmount, daysLeft};
+  return {price, amount, usdPrice, usdAmount, daysLeft: daysLeft.toFixed(2)};
 };

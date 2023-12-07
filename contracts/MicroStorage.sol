@@ -58,10 +58,6 @@ contract MicroStorage is IERC4907, ERC721Enumerable, Ownable, FunctionsClient, A
         subId = _subId;
         donId = _donId;
         secrets = _secrets;
-        _feeds[0x326C977E6efc84E512bB9C30f76E30c160eD06FB] = 0x1C2252aeeD50e0c9B64bDfF2735Ee3C932F5C408;
-        _feeds[0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889] = 0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada;
-        _feeds[0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F] = 0x0FCAa9c899EC5A91eBc3D5Dd869De833b06fB046;
-        _feeds[0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa] = 0x0715A7794a1dc8e42615F059dD6e406A6594651A;
     }
 
     function userInfo(uint256 tokenId) external view returns (UserInfo memory, bool) {
@@ -75,6 +71,14 @@ contract MicroStorage is IERC4907, ERC721Enumerable, Ownable, FunctionsClient, A
 
     function setMaxLimit(uint256 _newLimit) external onlyOwner {
         maxRentalSize = _newLimit;
+    }
+
+    function supportCoin(address coin, address feed) external onlyOwner {
+        _feeds[coin] = feed;
+    }
+
+    function removeCoin(address coin) external onlyOwner {
+        delete _feeds[coin];
     }
 
     function subscribe(address coin, uint256 amount, uint256 size) external {

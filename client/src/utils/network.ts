@@ -1,5 +1,5 @@
 export const MICRO_STORAGE_ADDRESSES: { [key: number]: `0x${string}` } = {
-  43113: '0xC3e70824aC133a6a6BEC620Fc48911eb24cc9AA0', // fuji
+  43113: '0x17C6E2f2F7fa7A630b09817559934dCDfCCEB4fb', // fuji
   1442: '0xC3e70824aC133a6a6BEC620Fc48911eb24cc9AA0', // zk
   80001: '0x330b4e3886686fdeFa675E4479A8726705Fc1dd9' // mumbai
 };

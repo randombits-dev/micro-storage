@@ -235,7 +235,7 @@ const FileContainer = ({manageAccount}) => {
   }
   return (
       <div className={manageAccount ? 'hidden' : 'flex-grow flex'}>
-        <div className="w-1/4 flex flex-col">
+        <div className="w-1/4 flex-none flex flex-col">
           <div className="text-center border-b border-dashed">↓ Create New Document ↓</div>
           <div className="border-b-2  grid grid-cols-4 items-center text-center">
             <button className="border-r p-2 hover:bg-neutral-200 "
@@ -262,7 +262,7 @@ const FileContainer = ({manageAccount}) => {
             <SideList data={data.files} openFile={openFile} selected={fileEntry}/>
           </FileDrop>
         </div>
-        <div className="flex-grow border-l flex flex-col">
+        <div className="flex-grow overflow-hidden border-l flex flex-col">
           {fileEntry &&
               <>
                 <div className="border-b flex items-center text-center">

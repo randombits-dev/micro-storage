@@ -9,7 +9,6 @@ const LuckysheetEditor = ({data, saveFile}) => {
 
   const handleMessage = (e) => {
     if (e.data.action === 'save') {
-      console.log(e.data.content);
       saveFile(JSON.stringify(e.data.content));
     }
   };
