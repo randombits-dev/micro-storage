@@ -1,12 +1,14 @@
 import {useAccount, useContractRead} from 'wagmi';
 import {microStorageABI} from '../generated';
-import {MicroStorageAddress} from '../utils/network';
+import {useContractAddress} from "./useContractAddress.ts";
 
 export const useMyAccount = () => {
   const {address} = useAccount();
+  const {contractAddress} = useContractAddress();
+
 
   const {data: balance, refetch: refetchToken} = useContractRead({
-    address: MicroStorageAddress,
+    address: contractAddress,
     abi: microStorageABI,
     functionName: 'balanceOf',
     enabled: !!address,
@@ -14,7 +16,7 @@ export const useMyAccount = () => {
   });
 
   const {data: result} = useContractRead({
-    address: MicroStorageAddress,
+    address: contractAddress,
     abi: microStorageABI,
     functionName: 'tokenOfOwnerByIndex',
     enabled: !!balance,
@@ -22,7 +24,7 @@ export const useMyAccount = () => {
   });
 
   const {data: userInfo, isSuccess, refetch: refetchUserInfo} = useContractRead({
-    address: MicroStorageAddress,
+    address: contractAddress,
     abi: microStorageABI,
     functionName: 'userInfo',
     args: [result as bigint],

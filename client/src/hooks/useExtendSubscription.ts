@@ -3,10 +3,11 @@ import {microStorageABI} from '../generated';
 import {useAllowance} from './useAllowance';
 import {useEffect} from 'react';
 import {useContractWriteStatus} from './useContractWriteStatus';
-import {MicroStorageAddress} from '../utils/network';
+import {useContractAddress} from "./useContractAddress.ts";
 
 export const useExtendSubscription = (coin: string, tokenId: number, amount: bigint) => {
   const {enough, execute: executeAllowance, status: statusAllowance, statusMsg: statusMsgAllowance, refetch} = useAllowance(coin, amount);
+  const {contractAddress} = useContractAddress();
 
   useEffect(() => {
     if (statusAllowance === 'success') {
@@ -15,7 +16,7 @@ export const useExtendSubscription = (coin: string, tokenId: number, amount: big
   }, [statusAllowance]);
 
   const {config, error: prepareError} = usePrepareContractWrite({
-    address: MicroStorageAddress,
+    address: contractAddress,
     abi: microStorageABI,
     functionName: 'extend',
     args: [BigInt(tokenId), amount],

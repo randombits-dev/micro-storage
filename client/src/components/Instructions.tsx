@@ -11,22 +11,8 @@ interface Props {
 }
 
 const Instructions = ({}: Props) => {
-
   const {hasToken, userInfo, signMessage, refetchToken} = useAccountContext();
   const {address} = useAccount();
-
-  // const checkForToken = () => {
-  //   refetchToken();
-  //   if (!hasToken) {
-  //     setTimeout(() => {
-  //       checkForToken();
-  //     }, 5000);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   checkForToken();
-  // }, []);
 
   const renderSub = () => {
 

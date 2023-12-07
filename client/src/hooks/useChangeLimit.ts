@@ -1,20 +1,22 @@
 import {useContractEvent, usePrepareContractWrite} from 'wagmi';
 import {microStorageABI} from '../generated';
 import {useContractWriteStatus} from './useContractWriteStatus';
-import {MicroStorageAddress} from '../utils/network';
 import {useAllowance} from './useAllowance.ts';
 import {UserInfo} from '../utils/definitions.ts';
 import {useEffect, useState} from 'react';
 import {useAccountContext} from '../providers/AccountProvider.tsx';
+import {useContractAddress} from "./useContractAddress.ts";
 
 export const useChangeLimit = (userInfo: UserInfo, size: number, amount: bigint) => {
   const {refetchUserInfo} = useAccountContext();
+  const {contractAddress} = useContractAddress();
+
   const [customStatus, setCustomStatus] = useState('');
   const {enough, execute: executeAllowance, status: statusAllowance, statusMsg: statusMsgAllowance, refetch} = useAllowance(userInfo.coin,
-    amount);
+      amount);
 
   const {config: increaseConfig, error: increaseError} = usePrepareContractWrite({
-    address: MicroStorageAddress,
+    address: contractAddress,
     abi: microStorageABI,
     functionName: 'increaseLimit',
     enabled: size > userInfo.size,
@@ -22,7 +24,7 @@ export const useChangeLimit = (userInfo: UserInfo, size: number, amount: bigint)
   });
 
   const {config: reduceConfig, error: reduceError} = usePrepareContractWrite({
-    address: MicroStorageAddress,
+    address: contractAddress,
     abi: microStorageABI,
     functionName: 'reduceLimit',
     enabled: size < userInfo.size,
@@ -45,7 +47,7 @@ export const useChangeLimit = (userInfo: UserInfo, size: number, amount: bigint)
   }, [statusReduce]);
 
   useContractEvent({
-    address: MicroStorageAddress,
+    address: contractAddress,
     abi: microStorageABI,
     eventName: 'LimitChanged',
     listener: (log) => {

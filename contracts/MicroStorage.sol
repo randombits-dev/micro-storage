@@ -21,7 +21,7 @@ contract MicroStorage is IERC4907, ERC721Enumerable, Ownable, FunctionsClient, A
     uint256 public basePrice = 1e16;
     uint256 public pricePerDay = 1e15;
     uint256 public minRentalTime = 80000;
-    uint256 public maxRentalTime = 2600000;
+    uint256 public maxRentalTime = 2700000;
     uint256 public maxRentalSize = 5;
 
     struct UserInfo {

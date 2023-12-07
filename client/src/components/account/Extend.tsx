@@ -7,8 +7,8 @@ import TemplateSpec from "../TemplateSpec.tsx";
 import {useAccountContext} from "../../providers/AccountProvider.tsx";
 import ContractWriteStatus from "../common/ContractWriteStatus.tsx";
 import Card from "../common/Card.tsx";
-import {COIN_LIST} from "../../utils/network.ts";
 import {usePriceFeed} from "../../hooks/usePriceFeed.ts";
+import {useContractAddress} from "../../hooks/useContractAddress.ts";
 
 interface Props {
 }
@@ -21,6 +21,8 @@ const Extend = ({}: Props) => {
   const [error, setError] = useState('');
   const {price, amount, usdPrice} = useEstimatePrice(userInfo.coin, days, userInfo.size);
   const {balance} = useBalance(userInfo.coin);
+  const {coinNames} = useContractAddress();
+
   const [success, setSuccess] = useState(false);
   const {
     execute,
@@ -57,9 +59,9 @@ const Extend = ({}: Props) => {
       return <div className="mt-5">
         {!enough ?
             <ActionButton handleClick={() => executeAllowance()}>Allow MicroStorage to
-              spend {COIN_LIST[userInfo.coin]}</ActionButton>
+              spend {coinNames[userInfo.coin]}</ActionButton>
             : <ActionButton additionalClasses="mt-3"
-                            handleClick={() => execute()}>Pay {price} {COIN_LIST[userInfo.coin]}</ActionButton>}
+                            handleClick={() => execute()}>Pay {price} {coinNames[userInfo.coin]}</ActionButton>}
       </div>;
     }
   };
@@ -92,7 +94,7 @@ const Extend = ({}: Props) => {
       return <ContractWriteStatus status={statusAllowance} statusMsg={statusMsgAllowance}/>;
     } else {
       return <>
-        <TemplateSpec name="COIN">{COIN_LIST[userInfo.coin]}</TemplateSpec>
+        <TemplateSpec name="COIN">{coinNames[userInfo.coin]}</TemplateSpec>
         <TemplateSpec name="BASE PRICE">0.01 USD per day</TemplateSpec>
         <TemplateSpec name="PRICE PER GB">0.001 USD per GB per day</TemplateSpec>
 
@@ -111,7 +113,7 @@ const Extend = ({}: Props) => {
             name="NEW EXPIRES">{new Date(userInfo.expires + days * 24 * 60 * 60 * 1000).toLocaleString()}</TemplateSpec>
         <TemplateSpec name="TOTAL">{usdPrice} USD</TemplateSpec>
         <TemplateSpec name="COIN PRICE">{formattedFeed} USD</TemplateSpec>
-        <TemplateSpec name="TOTAL IN COINS">{price} {COIN_LIST[userInfo.coin]}</TemplateSpec>
+        <TemplateSpec name="TOTAL IN COINS">{price} {coinNames[userInfo.coin]}</TemplateSpec>
         {
           writeButton()
         }</>;

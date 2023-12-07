@@ -2,6 +2,7 @@ import React, {createContext, useContext, useState} from 'react';
 import {useMyAccount} from "../hooks/useMyAccount.ts";
 import {useServerSignature} from "../hooks/useServerSignature.ts";
 import {formatSize} from "../utils/fileUtils.ts";
+import {Address} from "wagmi";
 
 
 export type AccountContextType = {
@@ -14,6 +15,7 @@ export type AccountContextType = {
   calcUsage: (usage: number) => void;
   usage: string;
   refetchToken: () => void;
+  contractAddress: Address;
 }
 // Create the context
 const AccountContext = createContext<AccountContextType>({
@@ -28,12 +30,13 @@ const AccountContext = createContext<AccountContextType>({
   },
   usage: '',
   refetchToken: () => {
-  }
+  },
+  contractAddress: ''
 });
 
 // Create the provider component
 export const AccountProvider = ({children}) => {
-  const {userInfo, hasToken, refetchUserInfo, refetchToken} = useMyAccount();
+  const {userInfo, hasToken, refetchUserInfo, refetchToken, contractAddress} = useMyAccount();
   const {hasSigned, signature, signMessage} = useServerSignature({token: userInfo?.token});
   const [usage, setUsage] = useState('');
 
@@ -42,10 +45,10 @@ export const AccountProvider = ({children}) => {
   };
 
   return (
-    <AccountContext.Provider
-      value={{hasToken, userInfo, refetchUserInfo, hasSigned, signature, signMessage, calcUsage, usage, refetchToken}}>
-      {children}
-    </AccountContext.Provider>
+      <AccountContext.Provider
+          value={{hasToken, userInfo, refetchUserInfo, hasSigned, signature, signMessage, calcUsage, usage, refetchToken, contractAddress}}>
+        {children}
+      </AccountContext.Provider>
   );
 };
 

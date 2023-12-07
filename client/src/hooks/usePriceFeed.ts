@@ -1,11 +1,13 @@
 import {Address, useContractRead} from 'wagmi';
-import {MicroStorageAddress} from '../utils/network';
 import {microStorageABI} from '../generated.ts';
 import {formatUnits} from 'viem';
+import {useContractAddress} from "./useContractAddress.ts";
 
 export const usePriceFeed = (coin) => {
+  const {contractAddress} = useContractAddress();
+
   const {data: priceFeed, refetch} = useContractRead({
-    address: MicroStorageAddress,
+    address: contractAddress,
     abi: microStorageABI,
     functionName: 'getPrice',
     args: [coin as Address]

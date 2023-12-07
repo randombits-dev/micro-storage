@@ -6,8 +6,8 @@ import {useEstimateIncreaseLimit, useEstimateReduce} from "../../hooks/useEstima
 import {useAccountContext} from "../../providers/AccountProvider.tsx";
 import ContractWriteStatus from "../common/ContractWriteStatus.tsx";
 import Card from "../common/Card.tsx";
-import {COIN_LIST} from "../../utils/network.ts";
 import {usePriceFeed} from "../../hooks/usePriceFeed.ts";
+import {useContractAddress} from "../../hooks/useContractAddress.ts";
 
 interface Props {
 }
@@ -15,6 +15,7 @@ interface Props {
 const ChangeLimit = ({}: Props) => {
   const {userInfo} = useAccountContext();
   const {formattedFeed} = usePriceFeed(userInfo.coin);
+  const {coinNames} = useContractAddress();
 
   const [size, setSize] = useState(userInfo.size);
   const [error, setError] = useState('');
@@ -39,9 +40,10 @@ const ChangeLimit = ({}: Props) => {
     } else if (size > userInfo.size) {
       return <div className="mt-5">
         {!enough ?
-          <ActionButton handleClick={() => executeAllowance()}>Allow MicroStorage to spend {COIN_LIST[userInfo.coin]}</ActionButton>
-          : <ActionButton additionalClasses="mt-3"
-                          handleClick={() => execute()}>Increase Limit</ActionButton>}
+            <ActionButton handleClick={() => executeAllowance()}>Allow MicroStorage to
+              spend {coinNames[userInfo.coin]}</ActionButton>
+            : <ActionButton additionalClasses="mt-3"
+                            handleClick={() => execute()}>Increase Limit</ActionButton>}
       </div>;
     } else if (size < userInfo.size) {
       return <div className="mt-5">
@@ -59,14 +61,14 @@ const ChangeLimit = ({}: Props) => {
         <TemplateSpec name="DAYS LEFT">{daysLeftIncrease}</TemplateSpec>
         <TemplateSpec name="TOTAL">{increaseUsdPrice} USD</TemplateSpec>
         <TemplateSpec name="COIN PRICE">{formattedFeed} USD</TemplateSpec>
-        <TemplateSpec name="TOTAL IN COINS">{increasePrice} {COIN_LIST[userInfo.coin]}</TemplateSpec>
+        <TemplateSpec name="TOTAL IN COINS">{increasePrice} {coinNames[userInfo.coin]}</TemplateSpec>
       </>;
     } else if (size < userInfo.size) {
       return <>
         <TemplateSpec name="DAYS LEFT">{daysLeftReduce}</TemplateSpec>
         <TemplateSpec name="REFUND">{reduceUsdPrice} USD</TemplateSpec>
         <TemplateSpec name="COIN PRICE">{formattedFeed} USD</TemplateSpec>
-        <TemplateSpec name="REFUND IN COINS">{refundPrice} {COIN_LIST[userInfo.coin]}</TemplateSpec></>;
+        <TemplateSpec name="REFUND IN COINS">{refundPrice} {coinNames[userInfo.coin]}</TemplateSpec></>;
     } else {
       return <></>;
     }
@@ -103,7 +105,7 @@ const ChangeLimit = ({}: Props) => {
     } else {
       return <>
         <div className="mb-5">Increase or Decrease your storage limit</div>
-        <TemplateSpec name="COIN">{COIN_LIST[userInfo.coin]}</TemplateSpec>
+        <TemplateSpec name="COIN">{coinNames[userInfo.coin]}</TemplateSpec>
         <TemplateSpec name="NEW LIMIT (GB)">
           <input className="rounded-xl border border-dashed border-neutral-800 bg-inherit w-20 px-5 py-1 outline-0"
                  onChange={updateSize}
@@ -120,9 +122,9 @@ const ChangeLimit = ({}: Props) => {
   };
 
   return (
-    <Card title="Change Limit" isDone={false}>
-      {writeContents()}
-    </Card>
+      <Card title="Change Limit" isDone={false}>
+        {writeContents()}
+      </Card>
   );
 };
 
