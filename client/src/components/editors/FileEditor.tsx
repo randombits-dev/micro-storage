@@ -2,6 +2,7 @@ import React from 'react';
 import ExcalidrawEditor from "./ExcalidrawEditor.tsx";
 import QuillEditor from "./QuillEditor.tsx";
 import UploadEditor from "./UploadEditor.tsx";
+import LuckysheetEditor from "./LuckysheetEditor.tsx";
 
 const FileEditor = ({file, contents, saveFile}) => {
   const renderEditor = () => {
@@ -11,6 +12,8 @@ const FileEditor = ({file, contents, saveFile}) => {
           return <ExcalidrawEditor saveFile={saveFile} data={contents}/>;
         case 'text':
           return <QuillEditor data={contents} saveFile={saveFile}/>;
+        case 'sheet':
+          return <LuckysheetEditor data={contents} saveFile={saveFile}/>;
         default:
           return <UploadEditor file={file}/>;
       }
@@ -20,9 +23,9 @@ const FileEditor = ({file, contents, saveFile}) => {
   };
 
   return (
-    <div className="flex-grow">
-      {renderEditor()}
-    </div>
+      <div className="flex-grow">
+        {renderEditor()}
+      </div>
   );
 };
 

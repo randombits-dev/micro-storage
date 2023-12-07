@@ -237,19 +237,24 @@ const FileContainer = ({manageAccount}) => {
       <div className={manageAccount ? 'hidden' : 'flex-grow flex'}>
         <div className="w-1/4 flex flex-col">
           <div className="text-center border-b border-dashed">↓ Create New Document ↓</div>
-          <div className="border-b-2  grid grid-cols-3 items-center text-center">
-            <button className="border-r p-3 hover:bg-neutral-200 "
+          <div className="border-b-2  grid grid-cols-4 items-center text-center">
+            <button className="border-r p-2 hover:bg-neutral-200 "
                     onClick={() => newEditor('text')}>
-              <i className="fa-solid fa-file-word mr-3"/>
+              <i className="fa-solid fa-file-word mr-2"/>
               <span>Text</span>
             </button>
-            <button className="border-r p-3 hover:bg-neutral-200 "
-                    onClick={() => newEditor('excalidraw')}><i className="fa-solid fa-diagram-project mr-3"/>
+            <button className="border-r p-2 hover:bg-neutral-200 "
+                    onClick={() => newEditor('sheet')}>
+              <i className="fa-solid fa-file-excel mr-2"/>
+              <span>Sheet</span>
+            </button>
+            <button className="border-r p-2 hover:bg-neutral-200 "
+                    onClick={() => newEditor('excalidraw')}><i className="fa-solid fa-diagram-project mr-2"/>
               <span>Sketch</span>
             </button>
 
-            <button className="p-3 hover:bg-neutral-200"
-                    onClick={openFileDialog}><i className="fa-solid fa-file-upload mr-3"/>
+            <button className="p-2 hover:bg-neutral-200"
+                    onClick={openFileDialog}><i className="fa-solid fa-file-upload mr-2"/>
               <span>Upload</span>
             </button>
           </div>
