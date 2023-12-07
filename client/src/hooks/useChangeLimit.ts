@@ -10,7 +10,8 @@ import {useAccountContext} from '../providers/AccountProvider.tsx';
 export const useChangeLimit = (userInfo: UserInfo, size: number, amount: bigint) => {
   const {refetchUserInfo} = useAccountContext();
   const [customStatus, setCustomStatus] = useState('');
-  const {enough, execute: executeAllowance, status: statusAllowance, statusMsg: statusMsgAllowance, refetch} = useAllowance(amount);
+  const {enough, execute: executeAllowance, status: statusAllowance, statusMsg: statusMsgAllowance, refetch} = useAllowance(userInfo.coin,
+    amount);
 
   const {config: increaseConfig, error: increaseError} = usePrepareContractWrite({
     address: MicroStorageAddress,

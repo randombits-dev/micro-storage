@@ -6,11 +6,11 @@ import {useAllowance} from './useAllowance';
 import {MicroStorageAddress} from '../utils/network';
 import {useAccountContext} from '../providers/AccountProvider.tsx';
 
-export const useSubscribe = (metadata: string | undefined, amount: bigint, size: number) => {
+export const useSubscribe = (coin: string, amount: bigint, size: number) => {
 
   const {address} = useAccount();
   const {refetchToken} = useAccountContext();
-  const {enough, execute: executeAllowance, status: statusAllowance, statusMsg: statusMsgAllowance, refetch} = useAllowance(amount);
+  const {enough, execute: executeAllowance, status: statusAllowance, statusMsg: statusMsgAllowance, refetch} = useAllowance(coin, amount);
 
   useEffect(() => {
     if (statusAllowance === 'success') {
@@ -38,7 +38,7 @@ export const useSubscribe = (metadata: string | undefined, amount: bigint, size:
       address: MicroStorageAddress,
       abi: microStorageABI,
       functionName: 'subscribe',
-      args: [metadata, amount, BigInt(size)]
+      args: [coin, amount, BigInt(size)]
     };
   }
 

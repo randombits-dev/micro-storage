@@ -6,6 +6,7 @@ export interface UserInfo {
   expires: number;
   size: number;
   expired: boolean;
+  coin: string;
 }
 
 export interface UserData {

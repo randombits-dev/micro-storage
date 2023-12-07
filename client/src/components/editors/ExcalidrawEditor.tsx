@@ -21,12 +21,9 @@ const ExcalidrawEditor = ({data, saveFile}) => {
       };
     }
     setParsedData(parsedData);
-    console.log(parsedData);
 
     let lastVersion = getSceneVersion(parsedData.elements) || 0;
-    console.log('initial scene ', lastVersion);
     setLastVersion(lastVersion);
-    let libraryCnt = parsedData.libraryItems?.length || 0;
 
     if (excalidrawAPI) {
       excalidrawAPI.updateScene(parsedData);
@@ -48,32 +45,15 @@ const ExcalidrawEditor = ({data, saveFile}) => {
 
   const onChange = (elements, appState, files) => {
     const newVersion = getSceneVersion(elements);
-    console.log('new version', newVersion);
     if (newVersion > lastVersion) {
       setLastVersion(newVersion);
-      // parsedData.elements = elements;
-      if (Object.keys(files).length !== 0) {
-        //non empty files
-        // data.files = files;
-      }
-      console.log('saving', {...parsedData, elements});
-
       saveFile(JSON.stringify({...parsedData, elements}));
     }
   };
 
-  // const onLibraryChange = (libraryItems) => {
-  //   const newCtn = libraryItems.length;
-  //   if (newCtn !== libraryCnt) {
-  //     libraryCnt = newCtn;
-  //
-  //   }
-  // };
-
   return (
     <div className="h-full">
       <Excalidraw theme={'light'} onChange={onChange}
-        // onLibraryChange={onLibraryChange}
                   UIOptions={UIOptions} excalidrawAPI={(api) => setExcalidrawAPI(api)}/>
     </div>
   );

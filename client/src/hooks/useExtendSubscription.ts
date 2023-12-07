@@ -5,8 +5,8 @@ import {useEffect} from 'react';
 import {useContractWriteStatus} from './useContractWriteStatus';
 import {MicroStorageAddress} from '../utils/network';
 
-export const useExtendSubscription = (tokenId: number, amount: bigint) => {
-  const {enough, execute: executeAllowance, status: statusAllowance, statusMsg: statusMsgAllowance, refetch} = useAllowance(amount);
+export const useExtendSubscription = (coin: string, tokenId: number, amount: bigint) => {
+  const {enough, execute: executeAllowance, status: statusAllowance, statusMsg: statusMsgAllowance, refetch} = useAllowance(coin, amount);
 
   useEffect(() => {
     if (statusAllowance === 'success') {

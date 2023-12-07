@@ -1,9 +1,0 @@
-import {UserInfo} from '../utils/definitions';
-import {formatUSDC} from '../utils/numberUtils';
-
-export const useEstimateRefund = (userInfo: UserInfo) => {
-  const timeLeft = userInfo.expires - new Date().getTime();
-  const daysLeft = Math.floor(timeLeft / 1000 / 3600 / 24);
-  const price = (Number(formatUSDC(BigInt(1000 * userInfo.size + 10000))) * daysLeft).toFixed(3) + ' USDC';
-  return {price, daysLeft};
-};

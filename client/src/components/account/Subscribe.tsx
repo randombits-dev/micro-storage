@@ -5,6 +5,8 @@ import ActionButton from "./../common/ActionButton.tsx";
 import {useSubscribe} from "../../hooks/useSubscribe.ts";
 import TemplateSpec from "./../TemplateSpec.tsx";
 import ContractWriteStatus from "./../common/ContractWriteStatus.tsx";
+import {usePriceFeed} from "../../hooks/usePriceFeed.ts";
+import {COIN_LIST} from "../../utils/network.ts";
 
 interface Props {
 }
@@ -13,8 +15,10 @@ const Subscribe = (params: Props) => {
   const [days, setDays] = useState(30);
   const [size, setSize] = useState(1);
   const [error, setError] = useState('');
-  const {price, amount} = useEstimatePrice(days, size);
-  const {balance} = useBalance();
+  const [coin, setCoin] = useState('0x326C977E6efc84E512bB9C30f76E30c160eD06FB');
+  const {priceFeed, formattedFeed} = usePriceFeed(coin);
+  const {price, amount, usdPrice} = useEstimatePrice(coin, days, size);
+  const {balance} = useBalance(coin);
   const {
     execute,
     enough,
@@ -24,7 +28,7 @@ const Subscribe = (params: Props) => {
     status,
     statusMsg,
     prepareError,
-  } = useSubscribe('ipfs://bafkreibg6lnujfx67jrx6ppka5lt3vzrqug5g4mmfa6jes7szr2tv2oybu', amount || BigInt(0), size);
+  } = useSubscribe(coin, amount || BigInt(0), size);
 
   const writeButton = () => {
     if (error) {
@@ -32,13 +36,12 @@ const Subscribe = (params: Props) => {
       }} additionalClasses="mt-3" disabled={true}>{error}</ActionButton>;
     } else if (balance < (amount || 0)) {
       return <ActionButton handleClick={() => {
-      }} additionalClasses="mt-3" disabled={true}>USDC balance too low</ActionButton>;
+      }} additionalClasses="mt-3" disabled={true}>Coin balance too low</ActionButton>;
     } else {
-      const approveText = enough ? 'USDC Approved' : `Allow MicroStorage to spend USDC`;
       return <div className="mt-5">
-        {!enough ? <ActionButton handleClick={() => executeAllowance()}>{approveText}</ActionButton>
-            : <ActionButton additionalClasses="mt-3"
-                            handleClick={() => execute()}>Pay {price} USDC</ActionButton>}
+        {!enough ? <ActionButton handleClick={() => executeAllowance()}>Allow MicroStorage to spend {COIN_LIST[coin]}</ActionButton>
+          : <ActionButton additionalClasses="mt-3"
+                          handleClick={() => execute()}>Pay {price} {COIN_LIST[coin]}</ActionButton>}
       </div>;
     }
   };
@@ -83,31 +86,43 @@ const Subscribe = (params: Props) => {
     return <ContractWriteStatus status={statusAllowance} statusMsg={statusMsgAllowance}/>;
   } else {
     return (
-        <div>
-          <TemplateSpec name="BASE PRICE">0.01 USDC per day</TemplateSpec>
-          <TemplateSpec name="PRICE PER GB">0.001 USDC per GB per day</TemplateSpec>
+      <div>
+        <TemplateSpec name="PAYMENT COIN">
+          <select className="rounded-xl border border-dashed border-neutral-800 bg-inherit px-5 py-1 outline-0"
+                  onChange={(e) => setCoin(e.target.value)} value={coin}>
+            {Object.entries(COIN_LIST).map(([key, value]) => {
+              return <option key={key} value={key}>{value}</option>;
+            })}
+          </select>
+        </TemplateSpec>
 
-          <TemplateSpec name="LIMIT (GB)">
-            <input className="rounded-xl border border-dashed border-neutral-800 bg-inherit w-20 px-5 py-1 outline-0"
-                   onChange={updateSize}
-                   type="text"
-                   value={size}
-            />
-          </TemplateSpec>
-          <TemplateSpec name="PRICE PER DAY">{Math.round((0.01 + 0.001 * size) * 1000) / 1000} per day</TemplateSpec>
 
-          <TemplateSpec name="DAYS"><input
-              className="rounded-xl border border-dashed border-neutral-800 bg-inherit w-20 px-5 py-1 outline-0"
-              onChange={updateDays}
-              type="text"
-              value={days}
+        <TemplateSpec name="BASE PRICE">0.01 USD per day</TemplateSpec>
+        <TemplateSpec name="PRICE PER GB">0.001 USD per GB per day</TemplateSpec>
+
+        <TemplateSpec name="LIMIT (GB)">
+          <input className="rounded-xl border border-dashed border-neutral-800 bg-inherit w-20 px-5 py-1 outline-0"
+                 onChange={updateSize}
+                 type="text"
+                 value={size}
           />
-          </TemplateSpec>
-          <TemplateSpec name="TOTAL">{price} USDC</TemplateSpec>
-          {
-            writeButton()
-          }
-        </div>
+        </TemplateSpec>
+        <TemplateSpec name="PRICE PER DAY">{Math.round((0.01 + 0.001 * size) * 1000) / 1000} USD per day</TemplateSpec>
+
+        <TemplateSpec name="DAYS"><input
+          className="rounded-xl border border-dashed border-neutral-800 bg-inherit w-20 px-5 py-1 outline-0"
+          onChange={updateDays}
+          type="text"
+          value={days}
+        />
+        </TemplateSpec>
+        <TemplateSpec name="TOTAL">{usdPrice} USD</TemplateSpec>
+        <TemplateSpec name="COIN PRICE">{formattedFeed} USD</TemplateSpec>
+        <TemplateSpec name="TOTAL IN COINS">{price} {COIN_LIST[coin]}</TemplateSpec>
+        {
+          writeButton()
+        }
+      </div>
     );
   }
 

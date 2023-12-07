@@ -1,23 +1,25 @@
 import React, {useState} from 'react';
 import TemplateSpec from "../TemplateSpec.tsx";
 import ActionButton from "../common/ActionButton.tsx";
-import {useEstimateReduce} from "../../hooks/useEstimateReduce.ts";
 import {useChangeLimit} from "../../hooks/useChangeLimit.ts";
-import {useEstimateIncreaseLimit} from "../../hooks/useEstimatePrice.ts";
+import {useEstimateIncreaseLimit, useEstimateReduce} from "../../hooks/useEstimatePrice.ts";
 import {useAccountContext} from "../../providers/AccountProvider.tsx";
 import ContractWriteStatus from "../common/ContractWriteStatus.tsx";
 import Card from "../common/Card.tsx";
+import {COIN_LIST} from "../../utils/network.ts";
+import {usePriceFeed} from "../../hooks/usePriceFeed.ts";
 
 interface Props {
 }
 
 const ChangeLimit = ({}: Props) => {
   const {userInfo} = useAccountContext();
+  const {formattedFeed} = usePriceFeed(userInfo.coin);
 
   const [size, setSize] = useState(userInfo.size);
   const [error, setError] = useState('');
-  const {price: refundPrice, daysLeft: daysLeftReduce} = useEstimateReduce(userInfo, size);
-  const {price: increasePrice, amount, daysLeft: daysLeftIncrease} = useEstimateIncreaseLimit(userInfo, size);
+  const {price: refundPrice, daysLeft: daysLeftReduce, usdPrice: reduceUsdPrice} = useEstimateReduce(userInfo, size);
+  const {price: increasePrice, amount, usdPrice: increaseUsdPrice, daysLeft: daysLeftIncrease} = useEstimateIncreaseLimit(userInfo, size);
   const {
     execute,
     executeAllowance,
@@ -35,9 +37,9 @@ const ChangeLimit = ({}: Props) => {
     if (error) {
       return <ActionButton additionalClasses="mt-5" disabled={true}>{error}</ActionButton>;
     } else if (size > userInfo.size) {
-      const approveText = enough ? 'USDC Approved' : `Allow MicroStorage to spend USDC`;
       return <div className="mt-5">
-        {!enough ? <ActionButton handleClick={() => executeAllowance()}>{approveText}</ActionButton>
+        {!enough ?
+          <ActionButton handleClick={() => executeAllowance()}>Allow MicroStorage to spend {COIN_LIST[userInfo.coin]}</ActionButton>
           : <ActionButton additionalClasses="mt-3"
                           handleClick={() => execute()}>Increase Limit</ActionButton>}
       </div>;
@@ -55,12 +57,18 @@ const ChangeLimit = ({}: Props) => {
     if (size > userInfo.size) {
       return <>
         <TemplateSpec name="DAYS LEFT">{daysLeftIncrease}</TemplateSpec>
-
-        <TemplateSpec name="ESTIMATED COST">{increasePrice}</TemplateSpec>
+        <TemplateSpec name="TOTAL">{increaseUsdPrice} USD</TemplateSpec>
+        <TemplateSpec name="COIN PRICE">{formattedFeed} USD</TemplateSpec>
+        <TemplateSpec name="TOTAL IN COINS">{increasePrice} {COIN_LIST[userInfo.coin]}</TemplateSpec>
       </>;
+    } else if (size < userInfo.size) {
+      return <>
+        <TemplateSpec name="DAYS LEFT">{daysLeftReduce}</TemplateSpec>
+        <TemplateSpec name="REFUND">{reduceUsdPrice} USD</TemplateSpec>
+        <TemplateSpec name="COIN PRICE">{formattedFeed} USD</TemplateSpec>
+        <TemplateSpec name="REFUND IN COINS">{refundPrice} {COIN_LIST[userInfo.coin]}</TemplateSpec></>;
     } else {
-      return <>        <TemplateSpec name="DAYS LEFT">{daysLeftReduce}</TemplateSpec>
-        <TemplateSpec name="ESTIMATED REFUND">{refundPrice}</TemplateSpec></>;
+      return <></>;
     }
   };
 
@@ -95,6 +103,7 @@ const ChangeLimit = ({}: Props) => {
     } else {
       return <>
         <div className="mb-5">Increase or Decrease your storage limit</div>
+        <TemplateSpec name="COIN">{COIN_LIST[userInfo.coin]}</TemplateSpec>
         <TemplateSpec name="NEW LIMIT (GB)">
           <input className="rounded-xl border border-dashed border-neutral-800 bg-inherit w-20 px-5 py-1 outline-0"
                  onChange={updateSize}
@@ -103,7 +112,7 @@ const ChangeLimit = ({}: Props) => {
           />
         </TemplateSpec>
         <TemplateSpec name="CHANGE OF">{size - userInfo.size} GB</TemplateSpec>
-        <TemplateSpec name="PRICE PER GB">0.001 USDC per GB per day</TemplateSpec>
+        <TemplateSpec name="PRICE PER GB">0.001 USD per GB per day</TemplateSpec>
         {writePrice()}
         {writeButton()}
       </>;

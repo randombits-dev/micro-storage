@@ -5,7 +5,6 @@ import {useAccount} from "wagmi";
 import {CustomWalletButton} from "./CustomWalletButton.tsx";
 import {formatExpires} from "../utils/dates.ts";
 import ActionButton from "./common/ActionButton.tsx";
-import GiveMe from "./account/GiveMe.tsx";
 import {useBalance} from "../hooks/useBalance.ts";
 import Card from "./common/Card.tsx";
 
@@ -41,12 +40,6 @@ const Instructions = ({}: Props) => {
     </Card>;
   };
 
-  const renderGiveMe = () => {
-    return <Card title="Get Test USDC" isDone={!!Number(balance)}>
-      <GiveMe/>
-    </Card>;
-  };
-
   const renderSign = () => {
     return <Card title="Sign to Login" isDone={false}>
       <ActionButton handleClick={() => signMessage()}>Sign In
@@ -70,7 +63,6 @@ const Instructions = ({}: Props) => {
         <CustomWalletButton/>
       </Card>
 
-      {address && renderGiveMe()}
       {address && renderSub()}
       {userInfo?.token && renderSign()}
 

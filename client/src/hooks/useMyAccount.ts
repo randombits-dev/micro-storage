@@ -37,7 +37,8 @@ export const useMyAccount = () => {
         user: userInfo![0].user,
         expires: Number(userInfo![0].expires) * 1000,
         size: Number(userInfo![0].size),
-        expired: userInfo![1]
+        expired: userInfo![1],
+        coin: userInfo![0].coin
       },
       refetchUserInfo,
       refetchToken

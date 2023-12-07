@@ -1,11 +1,11 @@
 import {Address, erc20ABI, useAccount, useContractRead, usePrepareContractWrite} from 'wagmi';
 import {useContractWriteStatus} from './useContractWriteStatus';
-import {MicroStorageAddress, USDCAddress} from '../utils/network';
+import {MicroStorageAddress} from '../utils/network';
 
-export const useAllowance = (amount: bigint) => {
+export const useAllowance = (coin: string, amount: bigint) => {
   const {address} = useAccount();
   const {data, isFetched, refetch} = useContractRead({
-    address: USDCAddress,
+    address: coin as Address,
     abi: erc20ABI,
     functionName: 'allowance',
     args: [address as Address, MicroStorageAddress]
@@ -13,7 +13,7 @@ export const useAllowance = (amount: bigint) => {
   const enough = (data || 0) >= amount;
 
   const {config} = usePrepareContractWrite({
-    address: USDCAddress,
+    address: coin as Address,
     abi: erc20ABI,
     functionName: 'approve',
     args: [MicroStorageAddress, amount],
