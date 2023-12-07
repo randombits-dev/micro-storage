@@ -71,11 +71,15 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
     pricePerDay = _pricePerMonth;
   }
 
+  function setMaxLimit(uint256 _newLimit) external onlyOwner {
+    maxRentalSize = _newLimit;
+  }
+
   function subscribe(string memory metadata, uint256 amount, uint256 size) external {
     require(size <= maxRentalSize, "size too large");
     uint256 timeRequested = amount.mul(86400).div(pricePerDay.mul(size).add(basePrice));
-    require(timeRequested >= minRentalTime, "minimum rental time not met");
-    require(timeRequested <= maxRentalTime, "max rental time");
+    require(timeRequested >= minRentalTime, "under min subscription time");
+    require(timeRequested <= maxRentalTime, "over max subscription time");
     IERC20 tk = IERC20(paymentCoin);
     tk.transferFrom(msg.sender, address(this), amount);
     _mint(msg.sender, nftId);
@@ -93,7 +97,7 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
     require(userOf(tokenId) == msg.sender, "caller is not owner");
     UserInfo storage user = _userInfo[tokenId];
     uint256 timeRequested = amount.mul(86400).div(pricePerDay.mul(user.size).add(basePrice));
-    require(user.expires + timeRequested < block.timestamp + maxRentalTime, "max rental time");
+    require(user.expires + timeRequested < block.timestamp + maxRentalTime, "over max subscription time");
 
     IERC20 tk = IERC20(paymentCoin);
     tk.transferFrom(msg.sender, address(this), amount);
@@ -182,15 +186,12 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
   view
   override
   returns (bool upkeepNeeded, bytes memory performData) {
-    // int256[] memory expired = [];
     for (uint256 i = totalSupply(); i > 0; i--) {
       uint256 tokenId = tokenByIndex(i - 1);
       if (uint256(_userInfo[tokenId].expires) < block.timestamp) {
         return (true, abi.encode(tokenId));
       }
     }
-    // bool hasExpired = expired.length > 0;
-    // return (hasExpired, abi.encode(expired));
     return (false, "");
   }
 
@@ -199,14 +200,10 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
     (tokenId) = abi.decode(performData, (uint256));
     lastTokenId = tokenId;
     if (uint256(_userInfo[tokenId].expires) < block.timestamp) {
+      address user = _userInfo[tokenId].user;
       _burn(tokenId);
-      sendRequest(_userInfo[tokenId].user, tokenId, 0, 4, MicroStorageSource.postRequest);
+      sendRequest(user, tokenId, 0, 4, MicroStorageSource.postRequest);
     }
-  }
-
-  function testExpire(uint256 tokenId) external onlyOwner {
-    UserInfo storage user = _userInfo[tokenId];
-    user.expires = uint64(block.timestamp);
   }
 
   function setUser(uint256, address, uint64) external pure override {
