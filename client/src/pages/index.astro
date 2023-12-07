@@ -49,14 +49,30 @@ import Layout from '../layouts/Layout.astro';
     <div class="mt-20 pt-20 text-center border-t-2 border-neutral-800">
       <div class="font-elegant text-8xl mb-32">How it works</div>
       <div class="container mx-auto">
-        <div class="flex gap-8">
-          <div class="text-xl rounded-[30px] border-2 border-neutral-800 flex items-center relative">
-            <i class="fa-brands absolute left-[-2px] top-[-1px] fa-bitcoin text-6xl border-neutral-800 border-dashed"/>
-            <div class="text-3xl px-5 py-[10px] ml-16 ">Pay with Crypto</div>
+        <div class="grid grid-cols-3 gap-8">
+          <div class="text-xl text-center">
+            <i class="fa-brands fa-bitcoin text-6xl"/>
+            <div class="text-3xl px-5 py-[20px]">Pay with Crypto</div>
+            <div>
+              Pay for your subscription with crypto. Increase and decrease your storage limit as
+              needed. Unsubscribe at any time and receive a refund for remaining time.
+            </div>
           </div>
-          <div class="text-xl rounded-[30px] border-2 border-neutral-800 flex items-center relative">
-            <i class="fas fa-file-word absolute left-[-2px] top-[-2px] text-[61px] border-neutral-800 border-dashed"/>
-            <div class="text-3xl px-5 py-[10.4px] ml-16 ">Create text documents</div>
+          <div class="text-xl text-center">
+            <span class="fas font-elegant text-2xl border-2 rounded-[40px] p-3 bg-neutral-800 text-neutral-100">
+              NFT
+            </span>
+            <div class="text-3xl px-5 py-[20px]">NFT Subscriptions</div>
+            <div>
+              Your subscription is represented by an NFT with an expiration date, making it completely managed on the blockchain.
+            </div>
+          </div>
+          <div class="text-xl text-center">
+            <i class="fas fa-file-word text-3xl bg-neutral-800 text-neutral-100 w-[60px] h-[60px] p-3 rounded-[40px]"/>
+            <div class="text-3xl px-5 py-[20px]">Document Storage</div>
+            <div>
+              Create and edit rich text documents or diagrams right in the app. Or upload any file type.
+            </div>
           </div>
         </div>
       </div>
@@ -131,6 +147,17 @@ import Layout from '../layouts/Layout.astro';
         <div class="footer-section footer-logo">
           <img src="/logo-dark.png" alt="logo" width="400" class="text-center"/>
 
+          <div class="flex ml-20 gap-5 mt-10">
+            <a href="https://twitter.com/RandomBitsDev" class="mr-5">
+              <i class="fab fa-twitter text-4xl"/>
+            </a>
+            <a href="https://discord.gg/drHPTNuk">
+              <i class="fab fa-discord text-4xl"/>
+            </a>
+            <a href="https://github.com/randombits-dev/micro-storage" class="ml-5">
+              <i class="fab fa-github text-4xl"/>
+            </a>
+          </div>
 
           <!--<div>-->
           <!--  <button class="hero-btn" id="jump-in-btn">Jump in &nbsp;&nbsp;&rarr;</button>-->

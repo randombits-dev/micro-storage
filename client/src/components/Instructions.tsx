@@ -26,7 +26,7 @@ const Instructions = ({}: Props) => {
       }, 5000);
     }
   };
-  
+
   useEffect(() => {
     checkForToken();
   }, []);
@@ -58,11 +58,12 @@ const Instructions = ({}: Props) => {
   return <div>
     <div className="container mx-auto flex items-center justify-center">
       <img src="/logo-light.png" alt="logo" width="400" className="mt-5"/>
-      {/*<img src="/logo.svg" className="w-28 h-28 mx-auto" alt="logo"/>*/}
-      {/*<div className="text-3xl flex-grow absolute top-5 left-5">Micro Storage</div>*/}
-
     </div>
-    <div className="w-[500px] mx-auto py-20">
+    <div className="bg-yellow-300 px-10 py-3 text-center mt-10">
+      <i className="fas fa-warning mr-5 text-3xl"/>
+      This is a pre-alpha release. Please use for testing purposes only, and do not upload any sensitive documents.
+    </div>
+    <div className="w-[500px] mx-auto py-10">
       <div className="text-2xl font-bold text-center">Perform the following steps to get started:</div>
 
       <Card title="Connect Wallet" isDone={address}>
