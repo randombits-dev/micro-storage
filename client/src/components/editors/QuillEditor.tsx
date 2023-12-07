@@ -29,6 +29,8 @@ const QuillEditor = ({data, saveFile}) => {
       } catch {
         quill.setText(initialText);
       }
+    } else {
+      quill.setText('');
     }
     quill.on('text-change', () => {
       saveFile(JSON.stringify(quill.getContents()));

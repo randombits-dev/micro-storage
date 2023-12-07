@@ -25,9 +25,9 @@ export const useUnsubscribe = (tokenId: number) => {
     listener: (log) => {
       if (log[0]) {
         const userId = (log[0].args as any).user;
-        console.log('unsubscribe: ' + userId);
-        if (userId === address) {
+        if (userId?.toUpperCase() === address?.toUpperCase()) {
           void refetchToken();
+          sessionStorage.clear();
           setTimeout(() => {
             window.location.href = '/';
           }, 1000);

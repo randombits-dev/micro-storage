@@ -36,10 +36,10 @@ const FileDrop = ({children, onDrop}) => {
   };
 
   return (
-      <div onDrop={handleDrop} onDragEnter={handleEnter} onDragOver={handleEnter} onDragLeave={handleDragLeave}
-           className={active ? 'draggedOver' : ''}>
-        {children}
-      </div>
+    <div onDrop={handleDrop} onDragEnter={handleEnter} onDragOver={handleEnter} onDragLeave={handleDragLeave}
+         className={active ? 'border-2 border-dashed flex-grow' : 'flex-grow'}>
+      {children}
+    </div>
   );
 };
 

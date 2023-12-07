@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
 import "./IERC4907.sol";
@@ -19,11 +20,11 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
 
   uint256 public basePrice = 1e4;
   uint256 public pricePerDay = 1e3;
-//  uint256 public maxUsers = 100;
-  uint256 public currentUsers = 0;
   uint256 public minRentalTime = 86400; // 1 day
   uint256 public maxRentalTime = 2592000; // 30 days
   uint256 public maxRentalSize = 5;
+  bytes public lastFailure;
+  uint256 public lastTokenId;
 
   struct UserInfo {
     address user;
@@ -46,7 +47,6 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
   uint64 private subId = 0;
   bytes32 private donId = 0x0;
   bytes private secrets;
-//  MicroConsumer consumer;
 
   mapping(uint256 => UserInfo) private _userInfo;
 
@@ -71,12 +71,7 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
     pricePerDay = _pricePerMonth;
   }
 
-//  function setMaxUsers(uint256 _maxUsers) external onlyOwner {
-//    maxUsers = _maxUsers;
-//  }
-
   function subscribe(string memory metadata, uint256 amount, uint256 size) external {
-//    cleanUpOldRentals();
     require(size <= maxRentalSize, "size too large");
     uint256 timeRequested = amount.mul(86400).div(pricePerDay.mul(size).add(basePrice));
     require(timeRequested >= minRentalTime, "minimum rental time not met");
@@ -90,8 +85,7 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
     info.expires = uint64(block.timestamp + timeRequested);
     info.payment = amount;
     info.size = size;
-    sendRequest(nftId, size, 0, MicroStorageSource.postRequest);
-
+    sendRequest(msg.sender, nftId, size, 0, MicroStorageSource.postRequest);
     nftId++;
   }
 
@@ -118,34 +112,28 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
     tk.transferFrom(msg.sender, address(this), amount);
     user.payment += amount;
     user.size = size;
-    sendRequest(nftId, size, 1, MicroStorageSource.postRequest);
+    sendRequest(msg.sender, tokenId, size, 1, MicroStorageSource.postRequest);
   }
 
-  function reduce(uint256 tokenId, uint256 size) external {
-    sendRequest(tokenId, size, 2, MicroStorageSource.postRequest);
+  function reduceLimit(uint256 tokenId, uint256 size) external {
+    require(userOf(tokenId) == msg.sender, "caller is not owner");
+    require(size > 0, "size must be at least 1");
+    require(size < _userInfo[tokenId].size, "size must be smaller");
+    sendRequest(msg.sender, tokenId, size, 2, MicroStorageSource.postRequest);
   }
 
   function unsubscribe(uint256 tokenId) external {
     require(userOf(tokenId) == msg.sender, "caller is not owner");
-    UserInfo storage user = _userInfo[tokenId];
-    uint256 secondsLeft = uint256(user.expires - block.timestamp);
-    if (secondsLeft > 0) {
-      uint256 creditsToGive = secondsLeft.mul(pricePerDay.mul(user.size).add(basePrice)).div(86400);
-      IERC20 tk = IERC20(paymentCoin);
-      tk.transfer(msg.sender, creditsToGive);
-      user.payment -= creditsToGive;
-    }
-    sendRequest(tokenId, 0, 3, MicroStorageSource.postRequest);
-    _burn(tokenId);
+    sendRequest(msg.sender, tokenId, 0, 3, MicroStorageSource.postRequest);
   }
 
-  function sendRequest(uint256 tokenId, uint256 limit, uint8 op, string memory source) internal {
+  function sendRequest(address user, uint256 tokenId, uint256 limit, uint8 op, string memory source) internal {
     FunctionsRequest.Request memory req;
     req.initializeRequestForInlineJavaScript(source);
     req.addSecretsReference(secrets);
 
     string[] memory args = new string[](3);
-    args[0] = Strings.toHexString(msg.sender);
+    args[0] = Strings.toHexString(user);
     args[1] = Strings.toString(tokenId);
     args[2] = Strings.toString(limit);
     req.setArgs(args);
@@ -156,10 +144,11 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
   function fulfillRequest(
     bytes32 requestId,
     bytes memory response,
-    bytes memory
+    bytes memory err
   ) internal override {
     bool success;
     (success) = abi.decode(response, (bool));
+    lastFailure = err;
     RequestInfo memory info = _requestInfo[requestId];
     if (success) {
       UserInfo storage user = _userInfo[info.tokenId];
@@ -183,8 +172,6 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
           user.payment -= creditsToGive;
         }
         emit Unsubscribe(info.tokenId, user.user);
-        _burn(info.tokenId);
-      } else if (info.op == 4) {
         _burn(info.tokenId);
       }
     }
@@ -210,23 +197,17 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
   function performUpkeep(bytes calldata performData) external override {
     uint256 tokenId;
     (tokenId) = abi.decode(performData, (uint256));
+    lastTokenId = tokenId;
     if (uint256(_userInfo[tokenId].expires) < block.timestamp) {
-      sendRequest(tokenId, 0, 4, MicroStorageSource.postRequest);
+      _burn(tokenId);
+      sendRequest(_userInfo[tokenId].user, tokenId, 0, 4, MicroStorageSource.postRequest);
     }
   }
 
-  function testExpire(uint256 tokenId) public {
+  function testExpire(uint256 tokenId) external onlyOwner {
     UserInfo storage user = _userInfo[tokenId];
     user.expires = uint64(block.timestamp);
   }
-
-  // function provideRefund(uint256 tokenId) external onlyOwner {
-  //   UserInfo storage user = _userInfo[tokenId];
-  //   IERC20 tk = IERC20(paymentCoin);
-  //   tk.transfer(user.user, user.payment);
-  //   user.payment = 0;
-  //   _burn(tokenId);
-  // }
 
   function setUser(uint256, address, uint64) external pure override {
     revert("cannot change user");
@@ -247,15 +228,6 @@ contract MicroStorage is IERC4907, ERC721URIStorage, ERC721Enumerable, Ownable, 
 
   function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721Enumerable, ERC721URIStorage) returns (bool) {
     return interfaceId == type(IERC4907).interfaceId || ERC721Enumerable.supportsInterface(interfaceId) || ERC721URIStorage.supportsInterface(interfaceId);
-  }
-
-  function cleanUpOldRentals() public {
-    for (uint256 i = totalSupply(); i > 0; i--) {
-      uint256 tokenId = tokenByIndex(i - 1);
-      if (uint256(_userInfo[tokenId].expires) < block.timestamp) {
-        _burn(tokenId);
-      }
-    }
   }
 
   function _beforeTokenTransfer(

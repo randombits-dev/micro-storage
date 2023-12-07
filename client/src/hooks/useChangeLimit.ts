@@ -23,7 +23,7 @@ export const useChangeLimit = (userInfo: UserInfo, size: number, amount: bigint)
   const {config: reduceConfig, error: reduceError} = usePrepareContractWrite({
     address: MicroStorageAddress,
     abi: microStorageABI,
-    functionName: 'reduce',
+    functionName: 'reduceLimit',
     enabled: size < userInfo.size,
     args: [BigInt(userInfo.token), BigInt(size)]
   });

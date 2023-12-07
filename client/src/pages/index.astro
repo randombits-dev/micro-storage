@@ -19,12 +19,13 @@ import Layout from '../layouts/Layout.astro';
       <!--    class="ml-10 font-pixel uppercase">Blockchain</span>-->
       <!--  </div>-->
       <!--</div>-->
-      <div class="mt-20 text-center text-[60px]">
+      <div class="mt-20 text-center ">
         <div class="text-[140px] font-elegant leading-tight">Cloud Storage</div>
-        <div class="">x</div>
-        <div class="font-thick">Blockchain Subscription Management</div>
+        <div class="text-[50px] inline-block mr-5">powered by</div>
+        <div class="font-thick text-[60px] inline-block"> NFT Subscriptions</div>
       </div>
-      <div class="mt-20 font-elegant font-bold text-center text-[24px] text-neutral-950">Only pay for the storage you need. <br/>
+      <div class="mt-20 text-center text-[32px] text-neutral-950">Only pay for the storage
+        you need. <br/>
         Subscriptions
         starting
         at $0.011 per
@@ -69,51 +70,56 @@ import Layout from '../layouts/Layout.astro';
           <div class="text-xl rounded-3xl border-2 border-neutral-800 items-center">
             <div class="border-b-2 border-neutral-800 flex items-center px-10 py-3">
               <i class="fas fa-file-word text-4xl border-neutral-800 border-dashed"/>
-              <div class="text-3xl px-5 py-[10px] ml-4 ">Create text documents</div>
+              <div class="text-3xl px-5 py-[10px] ml-4 ">Create rich documents</div>
             </div>
             <div class="px-5 py-3">
-              <div class="text-3xl">
-                # Rich text documents
+              <div class="text-4xl mb-5">
+                Example Design
               </div>
-              <div class="text-2xl">
-                ## with markdown shortcuts
+              <div class="text-3xl mb-4">
+                Requirements
               </div>
-              <div>* Uses the quill text editor</div>
+              <div class="ml-5">1. User can use markdown shortcuts</div>
+              <div class="ml-5">2. User can use code snippets</div>
+
+              <div class="text-3xl my-4">Technical Design</div>
+
+              <div class="px-5 py-3 border rounded-xl bg-neutral-700 text-neutral-200">
+                <div>const a = 1;</div>
+                <div>const b = 2;</div>
+                <div>const c = a + b;</div>
+              </div>
             </div>
           </div>
 
           <div class="text-xl rounded-3xl border-2 border-neutral-800 items-center">
             <div class="border-b-2 border-neutral-800 flex items-center px-10 py-3">
               <i class="fas fa-diagram-project text-4xl border-neutral-800 border-dashed"/>
-              <div class="text-3xl px-5 py-[10px] ml-4 ">Create sketches</div>
+              <div class="text-3xl px-5 py-[10px] ml-4 ">Create diagrams</div>
             </div>
             <div class="px-5 py-3">
-              <div class="text-3xl">
-                # Rich text documents
-              </div>
-              <div class="text-2xl">
-                ## with markdown shortcuts
-              </div>
-              <div>* Uses the quill text editor</div>
+              <img src="/diagram.png" class="mx-auto"/>
             </div>
           </div>
 
-          <div class="text-xl rounded-3xl border-2 border-neutral-800 items-center">
-            <div class="border-b-2 border-neutral-800 flex items-center px-10 py-3">
-              <i class="fas fa-file-upload text-4xl border-neutral-800 border-dashed"/>
-              <div class="text-3xl px-5 py-[10px] ml-4 ">Upload files</div>
-            </div>
-            <div class="px-5 py-3">
-              <div class="text-3xl">
-                # Rich text documents
-              </div>
-              <div class="text-2xl">
-                ## with markdown shortcuts
-              </div>
-              <div>* Uses the quill text editor</div>
-            </div>
-          </div>
 
+        </div>
+
+        <div class="mt-10 text-xl rounded-3xl border-2 border-neutral-800 items-center">
+          <div class="border-b-2 border-neutral-800 flex items-center px-10 py-3">
+            <i class="fas fa-file-upload text-4xl border-neutral-800 border-dashed"/>
+            <div class="text-3xl px-5 py-[10px] ml-4 ">Drag and drop to upload any file</div>
+          </div>
+          <div class="px-14 py-10 flex text-[90px] gap-12">
+            <i class="fa-solid fa-file-pdf"/>
+            <i class="fa-solid fa-file-excel"/>
+            <i class="fa-solid fa-file-zipper"/>
+            <i class="fa-solid fa-file-powerpoint"/>
+            <i class="fa-solid fa-file-image"/>
+            <i class="fa-solid fa-file-code"/>
+            <i class="fa-solid fa-file-video"/>
+            <i class="fa-solid fa-file-audio"/>
+          </div>
         </div>
 
       </div>
@@ -123,7 +129,7 @@ import Layout from '../layouts/Layout.astro';
       <div class="footer-content py-28 mt-28 container mx-auto">
 
         <div class="footer-section footer-logo">
-          <img src="/micro.png" alt="logo" width="400" class="text-center"/>
+          <img src="/logo-dark.png" alt="logo" width="400" class="text-center"/>
 
 
           <!--<div>-->
@@ -142,10 +148,10 @@ import Layout from '../layouts/Layout.astro';
           <a href="/docs/9-roadmap">Roadmap</a>
         </div>
         <div class="footer-section">
-          <div class="footer-section-title">Socials</div>
-          <a href="">Twitter (X)</a>
-          <a href="">Discord</a>
-          <a href="">Github</a>
+          <div class="footer-section-title">Contact</div>
+          <a href="https://twitter.com/RandomBitsDev">Twitter (X)</a>
+          <a href="https://discord.gg/drHPTNuk">Discord</a>
+          <a href="https://github.com/randombits-dev/micro-storage">Github</a>
         </div>
       </div>
 
@@ -156,7 +162,7 @@ import Layout from '../layouts/Layout.astro';
 
 <style>
   html, body {
-    font-family: 'Podkova', sans-serif;
+    font-family: 'Edu SA Beginner', sans-serif;
     background: url('/back.png');
   }
 

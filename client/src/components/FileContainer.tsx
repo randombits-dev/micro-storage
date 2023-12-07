@@ -11,11 +11,19 @@ import {WorkerUrl} from "../utils/network.ts";
 let timeout;
 let newestData;
 let newestTitle;
-const FileContainer = ({userInfo, signature, manageAccount}) => {
-  const {calcUsage} = useAccountContext();
+const FileContainer = ({manageAccount}) => {
+  const {calcUsage, userInfo, signature} = useAccountContext();
   const [fileEntry, setFileEntry] = useState<FileEntry | null>(null); // [file, setFile
   const [contents, setContents] = useState<string>('');
   const [data, setData] = useState<UserData>({files: [], size: 0});
+
+  const updateFileList = () => {
+    setData({...data});
+    const newSize = data.files.reduce((acc, file) => {
+      return acc + file.size;
+    }, 0);
+    calcUsage(newSize);
+  };
 
   useEffect(() => {
     if (signature) {
@@ -62,7 +70,7 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
         }).then((response) => {
           response.json().then((resJson) => {
             data.files.unshift(resJson);
-            setData({...data});
+            updateFileList();
           });
         }).catch((error) => {
           console.log(error);
@@ -77,6 +85,8 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
       clearTimeout(timeout);
       saveNow();
     }
+
+    newestTitle = file.name;
 
     if (!file.size || file.type === 'upload') {
       setFileEntry(file);
@@ -100,6 +110,7 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
         const [type, content] = base64UrlToString(text);
         setFileEntry(file);
         setContents(content);
+        newestData = content;
       });
       // response.blob().then((blob) => {
       //   callback(blob);
@@ -118,7 +129,7 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
     }
     timeout = setTimeout(() => {
       saveNow();
-    }, 2000);
+    }, 1000);
   };
 
   const saveFile = (newData: string) => {
@@ -128,7 +139,7 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
     }
     timeout = setTimeout(() => {
       saveNow();
-    }, 3000);
+    }, 1000);
   };
 
   const saveNow = () => {
@@ -153,25 +164,12 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
         if (index > -1) {
           data.files[index] = resJson;
         }
-        setData({...data});
+        updateFileList();
       });
 
     }).catch((error) => {
       console.log(error);
     });
-    newestData = null;
-    newestTitle = null;
-  };
-
-  const deleteSelected = () => {
-    // const idsToDelete: string[] = [];
-    // const selectedRows = document.querySelectorAll("input[type=checkbox]:checked");
-    // selectedRows.forEach((row) => {
-    //   idsToDelete.push(row.closest(".file-row")?.dataset.id);
-    // });
-    // if (idsToDelete.length > 0) {
-    //   deleteFiles(idsToDelete);
-    // }
   };
 
   const deleteFile = () => {
@@ -197,15 +195,19 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
       console.log(error);
     });
     data.files.splice(data.files.findIndex((file) => file.id === id), 1);
-    setData({...data});
+    updateFileList();
     setFileEntry(null);
     setContents('');
   };
 
   const newEditor = (type: string) => {
-    const newFile: FileEntry = {id: generateFileId(), name: new Date().toLocaleString(), type};
-    openFile(newFile);
-    data.files.unshift(newFile);
+    setFileEntry(null);
+    setTimeout(() => {
+      const newFile: FileEntry = {id: generateFileId(), name: new Date().toLocaleString(), type};
+      openFile(newFile);
+      data.files.unshift(newFile);
+    });
+
   };
 
   const openFileDialog = () => {
@@ -216,14 +218,25 @@ const FileContainer = ({userInfo, signature, manageAccount}) => {
 
   return (
     <div className={manageAccount ? 'hidden' : 'flex-grow flex'}>
-      <div className="w-1/4">
-        <div className="border-b flex items-center text-center">
-          <div className="px-5">Create New →</div>
+      <div className="w-1/4 flex flex-col">
+        <div className="text-center border-b border-dashed">↓ Create New Document ↓</div>
+        <div className="border-b-2  grid grid-cols-3 items-center text-center">
+          {/*<div className="px-5">Create New →</div>*/}
           {/*<button className="fa-solid fa-trash" onClick={deleteSelected}/>*/}
-          <button className="border-l border-r p-3 hover:bg-neutral-950 fa-solid fa-diagram-project"
-                  onClick={() => newEditor('excalidraw')}/>
-          <button className="border-r p-3 fa-solid hover:bg-neutral-950 fa-file-word" onClick={() => newEditor('text')}/>
-          <button className="border-r p-3 fa-solid hover:bg-neutral-950 fa-file-upload" onClick={openFileDialog}/>
+          <button className="border-r p-3 hover:bg-neutral-200 "
+                  onClick={() => newEditor('text')}>
+            <i className="fa-solid fa-file-word mr-3"/>
+            <span>Text</span>
+          </button>
+          <button className="border-r p-3 hover:bg-neutral-200 "
+                  onClick={() => newEditor('excalidraw')}><i className="fa-solid fa-diagram-project mr-3"/>
+            <span>Sketch</span>
+          </button>
+
+          <button className="p-3 hover:bg-neutral-200"
+                  onClick={openFileDialog}><i className="fa-solid fa-file-upload mr-3"/>
+            <span>Upload</span>
+          </button>
         </div>
         <FileDrop onDrop={uploadFiles}>
           <SideList data={data.files} openFile={openFile} selected={fileEntry}/>

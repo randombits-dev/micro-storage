@@ -28,15 +28,17 @@ const Subscribe = (params: Props) => {
 
   const writeButton = () => {
     if (error) {
-      return <button className="bg-neutral-800 px-10 py-3 w-full mt-5">{error}</button>;
+      return <ActionButton handleClick={() => {
+      }} additionalClasses="mt-3" disabled={true}>{error}</ActionButton>;
     } else if (balance < (amount || 0)) {
-      return <button className="bg-neutral-800 px-10 py-3 w-full mt-5">USDC balance too low</button>;
+      return <ActionButton handleClick={() => {
+      }} additionalClasses="mt-3" disabled={true}>USDC balance too low</ActionButton>;
     } else {
       const approveText = enough ? 'USDC Approved' : `Allow MicroStorage to spend USDC`;
       return <div className="mt-5">
         {!enough ? <ActionButton handleClick={() => executeAllowance()}>{approveText}</ActionButton>
-          : <ActionButton additionalClasses="mt-3"
-                          handleClick={() => execute()}>Pay {price} USDC</ActionButton>}
+            : <ActionButton additionalClasses="mt-3"
+                            handleClick={() => execute()}>Pay {price} USDC</ActionButton>}
       </div>;
     }
   };
@@ -72,37 +74,40 @@ const Subscribe = (params: Props) => {
   };
 
   if (status && status === 'success') {
-    return <ContractWriteStatus status={status} statusMsg="Waiting for chainlink result"/>;
+    return <>
+      <ContractWriteStatus status={status} statusMsg="Waiting for chainlink result"/>
+    </>;
   } else if (status) {
     return <ContractWriteStatus status={status} statusMsg={statusMsg}/>;
   } else if (!enough && statusAllowance && statusAllowance !== 'success') {
     return <ContractWriteStatus status={statusAllowance} statusMsg={statusMsgAllowance}/>;
   } else {
     return (
-      <div>
-        <TemplateSpec name="BASE PRICE">0.01 USDC per day</TemplateSpec>
-        <TemplateSpec name="PRICE PER GB">0.001 USDC per GB per day</TemplateSpec>
+        <div>
+          <TemplateSpec name="BASE PRICE">0.01 USDC per day</TemplateSpec>
+          <TemplateSpec name="PRICE PER GB">0.001 USDC per GB per day</TemplateSpec>
 
-        <TemplateSpec name="LIMIT (GB)">
-          <input className="rounded-xl border border-dashed border-neutral-800 bg-inherit w-20 px-5 py-1 outline-0"
-                 onChange={updateSize}
-                 type="text"
-                 value={size}
+          <TemplateSpec name="LIMIT (GB)">
+            <input className="rounded-xl border border-dashed border-neutral-800 bg-inherit w-20 px-5 py-1 outline-0"
+                   onChange={updateSize}
+                   type="text"
+                   value={size}
+            />
+          </TemplateSpec>
+          <TemplateSpec name="PRICE PER DAY">{Math.round((0.01 + 0.001 * size) * 1000) / 1000} per day</TemplateSpec>
+
+          <TemplateSpec name="DAYS"><input
+              className="rounded-xl border border-dashed border-neutral-800 bg-inherit w-20 px-5 py-1 outline-0"
+              onChange={updateDays}
+              type="text"
+              value={days}
           />
-        </TemplateSpec>
-        <TemplateSpec name="PRICE PER DAY">{Math.round((0.01 + 0.001 * size) * 1000) / 1000} per day</TemplateSpec>
-
-        <TemplateSpec name="DAYS"><input className="rounded-xl border border-dashed border-neutral-800 bg-inherit w-20 px-5 py-1 outline-0"
-                                         onChange={updateDays}
-                                         type="text"
-                                         value={days}
-        />
-        </TemplateSpec>
-        <TemplateSpec name="TOTAL">{price} USDC</TemplateSpec>
-        {
-          writeButton()
-        }
-      </div>
+          </TemplateSpec>
+          <TemplateSpec name="TOTAL">{price} USDC</TemplateSpec>
+          {
+            writeButton()
+          }
+        </div>
     );
   }
 

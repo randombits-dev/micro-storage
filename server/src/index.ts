@@ -91,18 +91,21 @@ async function handleOptions(request: Request) {
 }
 
 async function handlePut(request: Request, env: Env, ctx: ExecutionContext) {
-  const userId = request.headers.get('X-User-Id');
+  const userPart1 = request.headers.get('X-User-Id')?.toUpperCase();
   const fileName = request.headers.get('X-File-Name');
   let fileId = request.headers.get('X-File-Id');
   let fileType = request.headers.get('X-File-Type');
+  const tokenId = request.headers.get('X-Token-Id');
 
-  if (!userId || !fileName || !fileId) {
+  if (!userPart1 || !fileName || !fileId || !tokenId) {
     return new Response('Not authorized', {status: 401, headers});
   }
 
+  const userId = userPart1 + '_' + tokenId;
+
   let userObj: UserObj | undefined = await env.STORAGE_1.get(userId).then(r2Obj => r2Obj?.json());
   if (!userObj) {
-    userObj = {files: [], size: 0, limit: 0};
+    return new Response('Object Not Found', {status: 404, headers});
   }
 
   const fileSize = Math.ceil(Number(request.headers.get('Content-Length')) / 1024);
@@ -131,8 +134,10 @@ async function handlePut(request: Request, env: Env, ctx: ExecutionContext) {
 }
 
 async function handleGet(request: Request, env: Env, ctx: ExecutionContext) {
-  const userId = request.headers.get('X-User-Id');
+  const userPart1 = request.headers.get('X-User-Id')?.toUpperCase();
   const fileId = request.headers.get('X-File-Id');
+  const tokenId = request.headers.get('X-Token-Id');
+  const userId = userPart1 + '_' + tokenId;
 
   if (fileId) {
     const object = await env.STORAGE_2.get(fileId);
@@ -144,7 +149,10 @@ async function handleGet(request: Request, env: Env, ctx: ExecutionContext) {
 }
 
 async function handleDelete(request: Request, env: Env, ctx: ExecutionContext) {
-  const userId = request.headers.get('X-User-Id');
+  const userPart1 = request.headers.get('X-User-Id')?.toUpperCase();
+  const tokenId = request.headers.get('X-Token-Id');
+  const userId = userPart1 + '_' + tokenId;
+
   const {ids: fileIds} = await request.json() as any;
   if (!userId || !fileIds || fileIds.length === 0) {
     return new Response('Invalid request', {status: 400, headers});

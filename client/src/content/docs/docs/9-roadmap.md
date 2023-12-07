@@ -14,3 +14,7 @@ Most of the initial work was spent on the blockchain and backend functionality. 
 ### 2. Allow paying with other tokens
 
 Using Chainlink Price Feeds, we can allow users to pay with other tokens, such as LINK, ETH, or DAI.
+
+### 3. Allow sharing of storage accounts
+
+Allow users to create multiple storage accounts, with the ability to share them with other users by sharing the NFT.

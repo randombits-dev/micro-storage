@@ -25,7 +25,7 @@ export const useSubscribe = (metadata: string | undefined, amount: bigint, size:
     listener: (log) => {
       if (log[0]) {
         const userId = (log[0].args as any).user;
-        if (userId === address) {
+        if (userId?.toUpperCase() === address?.toUpperCase()) {
           void refetchToken();
         }
       }

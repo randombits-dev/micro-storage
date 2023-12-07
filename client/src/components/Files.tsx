@@ -18,7 +18,7 @@ const Files = ({userInfo, signature}: Props) => {
       <Navbar userInfo={userInfo} signature={signature} manageAccount={() => setManageAccount(!manageAccount)}/>
       {manageAccount && <ManageAccount back={() => setManageAccount(false)}/>}
 
-      <FileContainer userInfo={userInfo} signature={signature} manageAccount={manageAccount}/>
+      <FileContainer manageAccount={manageAccount}/>
 
 
     </div>

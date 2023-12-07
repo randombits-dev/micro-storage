@@ -12,7 +12,7 @@ const CHAINS: { [key: string]: any } = {
 
 const MICRO_STORAGE_ADDRESSES: { [key: string]: `0x${string}` } = {
   hardhat: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
-  'polygon-testnet': '0xadBC5Ec4b5b6362AF9f0A031670B6872d4ab4005',
+  'polygon-testnet': '0xe1C046Fc10a0ef6fE7050482A9b56E45ed6b4d2a',
   fantom: '0xC6537b534dEe49ff94A3193A65101f367c1C566A'
 };
 
@@ -25,7 +25,8 @@ export const CURRENT_CHAIN = CHAINS[CHAIN_ID];
 export const MicroStorageAddress = MICRO_STORAGE_ADDRESSES[CHAIN_ID];
 export const USDCAddress = USDC_ADDRESSES[CHAIN_ID];
 
-export const WorkerUrl = 'https://micro-storage-api.randombits.workers.dev';
+export const WorkerUrl = 'http://localhost:8787';
+// export const WorkerUrl = 'https://micro-storage-api.randombits.workers.dev';
 export const ChainLinkApiUrl = 'https://micro-storage-chainlink-api.randombits.workers.dev';
 
 export const createViemClient = () => {

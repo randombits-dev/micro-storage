@@ -42,10 +42,10 @@ export const AccountProvider = ({children}) => {
   };
 
   return (
-      <AccountContext.Provider
-          value={{hasToken, userInfo, refetchUserInfo, hasSigned, signature, signMessage, calcUsage, usage, refetchToken}}>
-        {children}
-      </AccountContext.Provider>
+    <AccountContext.Provider
+      value={{hasToken, userInfo, refetchUserInfo, hasSigned, signature, signMessage, calcUsage, usage, refetchToken}}>
+      {children}
+    </AccountContext.Provider>
   );
 };
 

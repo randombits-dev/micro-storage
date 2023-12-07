@@ -25,10 +25,10 @@ const DeleteMenu = ({onDelete}: Props) => {
       return <></>;
     }
 
-    return <div className="absolute top-6 right-0 border bg-neutral-950 z-10">
+    return <div className="absolute top-6 right-0 border bg-neutral-100 z-10">
       {/*<MenuItem onClick={onCopy}>Copy to Clipboard</MenuItem>*/}
-      <div className="cursor-pointer px-5 py-3 hover:bg-neutral-800 border-b" onClick={handleYes}>Delete</div>
-      <div className="cursor-pointer px-5 py-3 hover:bg-neutral-800" onClick={handleNo}>Cancel</div>
+      <div className="cursor-pointer px-5 py-3 hover:bg-neutral-200 border-b" onClick={handleYes}>Delete</div>
+      <div className="cursor-pointer px-5 py-3 hover:bg-neutral-200" onClick={handleNo}>Cancel</div>
     </div>;
   };
 

@@ -7012,20 +7012,6 @@ export const microStorageABI = [
   {
     stateMutability: 'nonpayable',
     type: 'function',
-    inputs: [],
-    name: 'cleanUpOldRentals',
-    outputs: [],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'currentUsers',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
     inputs: [
       { name: 'tokenId', internalType: 'uint256', type: 'uint256' },
       { name: 'amount', internalType: 'uint256', type: 'uint256' },
@@ -7070,6 +7056,20 @@ export const microStorageABI = [
     ],
     name: 'isApprovedForAll',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [],
+    name: 'lastFailure',
+    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [],
+    name: 'lastTokenId',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
   },
   {
     stateMutability: 'view',
@@ -7134,7 +7134,7 @@ export const microStorageABI = [
       { name: 'tokenId', internalType: 'uint256', type: 'uint256' },
       { name: 'size', internalType: 'uint256', type: 'uint256' },
     ],
-    name: 'reduce',
+    name: 'reduceLimit',
     outputs: [],
   },
   {

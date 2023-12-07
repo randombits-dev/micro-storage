@@ -18,22 +18,21 @@ export default {
       });
     }
 
-    // const token = request.headers.get('X-Token-Id');
-    const userId = request.headers.get('X-User-Id') as `0x${string}`;
     const chainlinkSecret = request.headers.get('X-Chainlink-Secret');
 
-    if (!userId || !chainlinkSecret || chainlinkSecret !== env.CHAINLINK_SECRET) {
+    if (!chainlinkSecret || chainlinkSecret !== env.CHAINLINK_SECRET) {
       return new Response('Not authorized', {status: 401});
     }
 
-    const body = await request.json() as { id: string, limit: number };
+    const body = await request.json() as { id: string, limit: number, token: string };
+    const userId = body.id.toUpperCase() + '_' + body.token;
 
-    let userObj: UserObj | undefined = await env.STORAGE_1.get(body.id).then(r2Obj => r2Obj?.json());
+    let userObj: UserObj | undefined = await env.STORAGE_1.get(userId).then(r2Obj => r2Obj?.json());
 
     if (body.limit == 0) {
       if (userObj) {
         const allFileIds = userObj.files.map(file => file.id);
-        const promises = [env.STORAGE_1.delete(body.id)];
+        const promises = [env.STORAGE_1.delete(userId)];
         if (allFileIds.length > 0) {
           promises.push(env.STORAGE_2.delete(allFileIds));
         }
@@ -43,13 +42,13 @@ export default {
       const limit = body.limit * 1024 * 1024;
       if (!userObj) {
         userObj = {files: [], size: 0, limit};
-        await env.STORAGE_1.put(body.id, JSON.stringify(userObj));
+        await env.STORAGE_1.put(userId, JSON.stringify(userObj));
       } else if (userObj.limit !== limit) {
         if (userObj.limit > limit && userObj.size > limit) {
           return new Response('Over Limit', {status: 400});
         }
         userObj.limit = limit;
-        await env.STORAGE_1.put(body.id, JSON.stringify(userObj));
+        await env.STORAGE_1.put(userId, JSON.stringify(userObj));
       }
     }
 

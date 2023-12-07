@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Subscribe from "./account/Subscribe.tsx";
 import {useAccountContext} from "../providers/AccountProvider.tsx";
 import {useAccount} from "wagmi";
@@ -15,8 +15,21 @@ interface Props {
 const Instructions = ({}: Props) => {
 
   const {balance} = useBalance();
-  const {hasToken, userInfo, signMessage, hasSigned} = useAccountContext();
+  const {hasToken, userInfo, signMessage, refetchToken} = useAccountContext();
   const {address} = useAccount();
+
+  const checkForToken = () => {
+    refetchToken();
+    if (!hasToken) {
+      setTimeout(() => {
+        checkForToken();
+      }, 5000);
+    }
+  };
+  
+  useEffect(() => {
+    checkForToken();
+  }, []);
 
   const renderSub = () => {
 
@@ -29,7 +42,7 @@ const Instructions = ({}: Props) => {
   };
 
   const renderGiveMe = () => {
-    return <Card title="Get Test USDC" isDone={Number(balance)}>
+    return <Card title="Get Test USDC" isDone={!!Number(balance)}>
       <GiveMe/>
     </Card>;
   };

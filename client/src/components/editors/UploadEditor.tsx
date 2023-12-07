@@ -1,6 +1,6 @@
 import React from 'react';
 import {FileEntry} from "../../utils/definitions.ts";
-import {base64UrlToString, downloadFile} from "../../utils/fileUtils.ts";
+import {downloadFile} from "../../utils/fileUtils.ts";
 import {useAccountContext} from "../../providers/AccountProvider.tsx";
 import ActionButton from "../common/ActionButton.tsx";
 import {WorkerUrl} from "../../utils/network.ts";
@@ -23,10 +23,8 @@ const UploadEditor = ({file}: Props) => {
       }
     }).then((response) => {
       response.text().then((text) => {
-        console.log(text);
-        const [type, content] = base64UrlToString(text);
-        console.log(content);
-        downloadFile(file.name, content);
+        // const [type, content] = base64UrlToString(text);
+        downloadFile(file.name, text);
       });
       // response.blob().then((blob) => {
       //   callback(blob);

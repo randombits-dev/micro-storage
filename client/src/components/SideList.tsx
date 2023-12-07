@@ -36,11 +36,11 @@ const SideList = ({data, openFile, selected}: Props) => {
       {
         data?.map((file) => {
           return <div key={file.id} data-id={file.id}
-                      className={`flex  items-center border-b cursor-pointer px-5 py-3 ${selected?.id === file.id ? 'bg-neutral-950' : 'hover:bg-neutral-950'}`}
+                      className={`flex  items-center border-b cursor-pointer px-5 py-3 ${selected?.id === file.id ? 'bg-neutral-200' : 'hover:bg-neutral-200'}`}
                       onClick={() => fileClick(file)}>
             {/*<input type="checkbox" className="w-6"/>*/}
             <div className="w-4 text-center text-lg">{renderIcon(file)}</div>
-            <div className="flex-grow mx-5 text-md">{file.name}</div>
+            <div className="flex-grow mx-5 text-md overflow-hidden text-ellipsis">{file.name}</div>
             <div className="flex-nowrap text-sm">{formatSize(file.size)}</div>
           </div>;
         })
