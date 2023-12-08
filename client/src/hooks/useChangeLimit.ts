@@ -43,6 +43,9 @@ export const useChangeLimit = (userInfo: UserInfo, size: number, amount: bigint)
   useEffect(() => {
     if (statusReduce === 'success') {
       setCustomStatus('waiting');
+      setTimeout(() => {
+        void refetchUserInfo();
+      }, 30000);
     }
   }, [statusReduce]);
 

@@ -3,6 +3,7 @@ import {microStorageABI} from '../generated';
 import {useContractWriteStatus} from './useContractWriteStatus';
 import {useAccountContext} from '../providers/AccountProvider.tsx';
 import {useContractAddress} from "./useContractAddress.ts";
+import {useEffect} from "react";
 
 export const useUnsubscribe = (tokenId: number) => {
   const {address} = useAccount();
@@ -20,11 +21,20 @@ export const useUnsubscribe = (tokenId: number) => {
 
   const {execute, status, statusMsg} = useContractWriteStatus(config);
 
+  useEffect(() => {
+    if (status === 'success') {
+      setTimeout(() => {
+        void refetchToken();
+      }, 30000);
+    }
+  }, [status]);
+
   useContractEvent({
     address: contractAddress,
     abi: microStorageABI,
     eventName: 'Unsubscribe',
     listener: (log) => {
+      console.log(log);
       if (log[0]) {
         const userId = (log[0].args as any).user;
         if (userId?.toUpperCase() === address?.toUpperCase()) {
