@@ -1,6 +1,6 @@
 ---
 title: Getting Started
-description: How to create a subscription to Micro Storage
+description: A guide to getting started in Micro Storage
 ---
 
 ## 1. Connect your wallet

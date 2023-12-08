@@ -54,7 +54,5 @@ An example sequence diagram of creating a subscription, and the expiration of a 
 
 ## Automatic Subscription Termination
 
-If the user does not extend their subscription before it expires, the NFT will expire automatically. There is a *
-*Chainlink Automation** job that will check for expired NFTs, and it will delete the NFT and send a request to *
-*Chainlink Functions** to delete the user's account on the server.
+If the user does not extend their subscription before it expires, the NFT will expire automatically. There is a **Chainlink Automation** job that will check for expired NFTs, and it will delete the NFT and send a request to **Chainlink Functions** to delete the user's account on the server.
 

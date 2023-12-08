@@ -9,6 +9,7 @@ The following types of documents are supported:
 
 * Rich Text - A rich text document that supports Markdown shortcuts
 * Drawing - A sketchpad for drawing diagrams - uses the Excalidraw library
+* Spreadsheet - A full-featured spreadsheet
 
 ### Creating documents
 
