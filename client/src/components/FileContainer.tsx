@@ -3,13 +3,7 @@ import SideList from "./SideList.tsx";
 import FileDrop from "./FileDrop.tsx";
 import FileEditor from "./editors/FileEditor.tsx";
 import {FileEntry, UserData} from "../utils/definitions.ts";
-import {
-  base64UrlToString,
-  blobToBase64,
-  generateFileId,
-  stringToBase64Url,
-  triggerFileUpload
-} from "../utils/fileUtils.ts";
+import {base64UrlToString, blobToBase64, generateFileId, stringToBase64Url, triggerFileUpload} from "../utils/fileUtils.ts";
 import {useAccountContext} from "../providers/AccountProvider.tsx";
 import DeleteMenu from "./common/DeleteMenu.tsx";
 import {WorkerUrl} from "../utils/network.ts";
@@ -98,6 +92,7 @@ const FileContainer = ({manageAccount}) => {
     }
 
     newestTitle = file.name;
+    newestData = null;
 
     if (!file.size || file.type === 'upload') {
       setFileEntry(file);
@@ -234,49 +229,49 @@ const FileContainer = ({manageAccount}) => {
     </div>;
   }
   return (
-      <div className={manageAccount ? 'hidden' : 'flex-grow flex'}>
-        <div className="w-1/4 flex-none flex flex-col">
-          <div className="text-center border-b border-dashed">↓ Create New Document ↓</div>
-          <div className="border-b-2  grid grid-cols-4 items-center text-center">
-            <button className="border-r p-2 hover:bg-neutral-200 "
-                    onClick={() => newEditor('text')}>
-              <i className="fa-solid fa-file-word mr-2"/>
-              <span>Text</span>
-            </button>
-            <button className="border-r p-2 hover:bg-neutral-200 "
-                    onClick={() => newEditor('sheet')}>
-              <i className="fa-solid fa-file-excel mr-2"/>
-              <span>Sheet</span>
-            </button>
-            <button className="border-r p-2 hover:bg-neutral-200 "
-                    onClick={() => newEditor('excalidraw')}><i className="fa-solid fa-diagram-project mr-2"/>
-              <span>Sketch</span>
-            </button>
+    <div className={manageAccount ? 'hidden' : 'flex-grow flex'}>
+      <div className="w-1/4 flex-none flex flex-col">
+        <div className="text-center border-b border-dashed">↓ Create New Document ↓</div>
+        <div className="border-b-2  grid grid-cols-4 items-center text-center">
+          <button className="border-r p-2 hover:bg-neutral-200 "
+                  onClick={() => newEditor('text')}>
+            <i className="fa-solid fa-file-word mr-2"/>
+            <span>Text</span>
+          </button>
+          <button className="border-r p-2 hover:bg-neutral-200 "
+                  onClick={() => newEditor('sheet')}>
+            <i className="fa-solid fa-file-excel mr-2"/>
+            <span>Sheet</span>
+          </button>
+          <button className="border-r p-2 hover:bg-neutral-200 "
+                  onClick={() => newEditor('excalidraw')}><i className="fa-solid fa-diagram-project mr-2"/>
+            <span>Sketch</span>
+          </button>
 
-            <button className="p-2 hover:bg-neutral-200"
-                    onClick={openFileDialog}><i className="fa-solid fa-file-upload mr-2"/>
-              <span>Upload</span>
-            </button>
-          </div>
-          <FileDrop onDrop={uploadFiles}>
-            <SideList data={data.files} openFile={openFile} selected={fileEntry}/>
-          </FileDrop>
+          <button className="p-2 hover:bg-neutral-200"
+                  onClick={openFileDialog}><i className="fa-solid fa-file-upload mr-2"/>
+            <span>Upload</span>
+          </button>
         </div>
-        <div className="flex-grow overflow-hidden border-l flex flex-col">
-          {fileEntry &&
-              <>
-                <div className="border-b flex items-center text-center">
-                  <input type="text" value={fileEntry?.name || ''} onChange={onTitleChange}
-                         className="bg-inherit border-0 text-2xl px-5 py-2 w-full outline-0"/>
-                  <DeleteMenu onDelete={deleteFile}/>
-                </div>
-
-                <FileEditor file={fileEntry} contents={contents} saveFile={saveFile}/>
-              </>
-          }
-
-        </div>
+        <FileDrop onDrop={uploadFiles}>
+          <SideList data={data.files} openFile={openFile} selected={fileEntry}/>
+        </FileDrop>
       </div>
+      <div className="flex-grow overflow-hidden border-l flex flex-col">
+        {fileEntry &&
+          <>
+            <div className="border-b flex items-center text-center">
+              <input type="text" value={fileEntry?.name || ''} onChange={onTitleChange}
+                     className="bg-inherit border-0 text-2xl px-5 py-2 w-full outline-0"/>
+              <DeleteMenu onDelete={deleteFile}/>
+            </div>
+
+            <FileEditor file={fileEntry} contents={contents} saveFile={saveFile}/>
+          </>
+        }
+
+      </div>
+    </div>
   );
 };
 

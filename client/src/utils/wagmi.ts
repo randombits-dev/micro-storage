@@ -1,10 +1,10 @@
 import {getDefaultWallets} from '@rainbow-me/rainbowkit';
 import {configureChains, createConfig} from 'wagmi';
 import {publicProvider} from 'wagmi/providers/public';
-import {avalancheFuji, polygonMumbai, polygonZkEvmTestnet} from "viem/chains";
+import {avalancheFuji, polygonMumbai} from "viem/chains";
 
 const {chains, publicClient, webSocketPublicClient} = configureChains(
-    [polygonMumbai, polygonZkEvmTestnet, avalancheFuji],
+    [polygonMumbai, avalancheFuji],
     [
       publicProvider(),
     ],
