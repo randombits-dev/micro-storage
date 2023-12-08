@@ -30,7 +30,7 @@ const LuckysheetEditor = ({data, saveFile}) => {
 
   };
 
-  return <iframe className="w-full h-full border-0 outline-0" ref={iframeWindow} src="/editors/lucky.html"
+  return <iframe className="w-full h-full border-0 outline-0" ref={iframeWindow} src="/editors/lucky/index.html"
                  onLoad={onReady}></iframe>;
 };
 
