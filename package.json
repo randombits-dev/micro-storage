@@ -15,8 +15,8 @@
     "format": "prettier --write .",
     "coverage": "hardhat coverage --solcoverjs ./.solcover.js",
     "fuzzing": "docker run -it --rm -v $PWD:/src trailofbits/eth-security-toolbox",
-    "merge": "sol-merger --export-plugin SPDXLicenseRemovePlugin \"./contracts/*.sol\" ./.merge-output",
-    "chainlinkSim": "hardhat run scripts/chainlinkSimulation.js"
+    "verify": "hardhat verify --network snowtrace 0x17C6E2f2F7fa7A630b09817559934dCDfCCEB4fb 0xA9d587a00A31A52Ed70D6026794a8FC5E2F5dCb0 1811 0x66756e2d6176616c616e6368652d66756a692d31000000000000000000000000 0xf427ed6a49d735b8107d76b958bd4d9103716f6a7312a71e827b7026762c7fb1c3dabada23015972e328b0db034e118fca048f7c9111cb0b593e2cd9d0c6278718e53f2cd3178a892ce2ec39a8a6f4d79d3cd1f4dd30c9a91e27e1ce8f70d87df810d3d62184e54616d637740585217acc3e308acd99e41b06e10d6aa03ee205b51cd702e8be959ea024cd07e6a5ac8d9cc3cfb21f6bd50d7d623bf56d3440a47d",
+    "merge": "sol-merger --export-plugin SPDXLicenseRemovePlugin \"./contracts/*.sol\" ./.merge-output"
   },
   "devDependencies": {
     "@chainlink/contracts": "^0.8.0",
